@@ -1,0 +1,158 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{hyperref}
+%\usepackage{listings}
+\usepackage{color}
+%\usepackage{textcomp}
+\usepackage{graphicx}
+
+\author{Riccardo Zanol}
+\title{Laboratory 1}
+
+\begin{document}
+\maketitle
+\section*{Experiment 1}
+\begin{enumerate}
+\item To compute the theoretical resolution from the camera properties it is
+possible to apply the formula for the field of view of a thin lense:
+\begin{equation}
+  \varphi = \tan^{-1}\frac{d}{2f}
+  \label{eq:phi}
+\end{equation}
+where $d$ and $f$ are, respectively, the camera's CCD height and focal
+length. Then the height of the portion of plane at distance $l$ that
+is projected on the sensor can be obtained with the formula:
+\begin{equation*}
+  h = 2 l \tan \varphi .
+\end{equation*}
+Knowing this size, the height of the region that gets projected on a
+single pixel can be computed by dividing $h$ by the number of pixels
+along the vertical dimension. For the D3300 camera the theoretical
+vertical resolutions are \SI{0.961}{\mm} at a focal length of
+\SI{18}{\mm} and \SI{0.314}{\mm} at a focal length of \SI{55}{\mm}.
+\item Measuring with ``GIMP'' the two lines of the pattern and then
+  dividing their known length by their length in pixels (shown in
+  Tab.~\ref{tab:pixel-lengths}) gives the theoretical spatial
+  resolution of the camera (Tab.~\ref{tab:resolution}). This
+  resolution is very close to the one computed from the camera's
+  properties.
+\begin{table}[h]
+  \centering
+  \begin{tabular}{rrr}
+    Focal length & Vertical line & Horizontal line \\
+    \hline
+    \SI{18}{\mm} & \SI{163}{px} & \SI{216}{px} \\
+    \SI{55}{\mm} & \SI{477}{px} & \SI{635}{px}
+  \end{tabular}
+  \caption{Measured pixel lengths}
+  \label{tab:pixel-lengths}
+\end{table}
+\begin{table}[h]
+  \centering
+  \begin{tabular}{rrr}
+    Focal length & Vertical resolution & Horizontal resolution \\
+    \hline
+    \SI{18}{\mm} & \SI{0.926}{\mm} & \SI{0.920}{\mm} \\
+    \SI{55}{\mm} & \SI{0.315}{\mm} & \SI{0.314}{\mm}
+  \end{tabular}
+  \caption{Resolution}
+  \label{tab:resolution}
+\end{table}
+\item Zooming in on the pattern and watching the checkerboard it can
+  be observed that the real resolution is less than half of the
+  theoretical one. On the picture taken with a focal length of
+  \SI{18}{\mm} it is possible to distinguish the \SI{25}{\mm} wide
+  checkerboard squares but not the smaller ones. With a greater focal
+  length (\SI{55}{\mm}) the squares are distinguishable down to
+  \SI{13}{\mm}. This loss of resolution may be caused by noise, by the
+  distorsion of the lenses or the camera may not be perfectly focused.
+\end{enumerate}
+\section*{Experiment 2}
+\begin{enumerate}
+\item The horizontal and vertical field of view can be computed from
+  $f$ using equation (\ref{eq:phi}) where $d$ is the horizontal or
+  vertical length of the CCD sensor. For the S9900 camera the field of
+  view is:
+  \begin{align*}
+    \varphi_x &= \tan^{-1}\frac{6.17}{2f} \\
+    \varphi_y &= \tan^{-1}\frac{4.55}{2f}
+  \end{align*}
+  while for the A720is it is:
+  \begin{align*}
+    \varphi_x &= \tan^{-1}\frac{5.8}{2f} \\
+    \varphi_y &= \tan^{-1}\frac{4.35}{2f}
+  \end{align*}
+\item In the image \texttt{objects\_55mm.jpg} the vertical line is
+  641~pixels long, so it corresponds to a line of height $641 \cdot
+  h_p$ on the sensor, where $h_p = \frac{15.6}{4000}\,\si{\mm}$ is the
+  height of a single pixel on the CCD. Using the equation
+\[ \varphi = \tan^{-1} \frac{d}{2f} \]
+the angle that the line occupies in the camera's field of view can be
+computed. Since the height $h = \SI{20}{\cm}$ of the line is known,
+the distance $l$ between the camera and the pattern can be obtained
+from the equation
+\[ \frac{h}{2} = l \tan \varphi . \]
+So the camera is at $l = \frac{hf}{641 h_p} = \SI{4.4}{\m}$ from the
+pattern.
+\item Let $h_{pix} = \frac{\SI{20}{\cm}}{\SI{641}{px}}$ be the height
+  of the region that is projected on a single pixel from distance $l =
+  \SI{443.5}{\cm}$. This region is, from the point of view of the
+  camera, equivalent to a region positioned at distance $l'$ of height
+  $h_{pix}' = \frac{h_{pix}l'}{l}$, since $\tan \varphi =
+  \frac{h_{pix}'/2}{l'} = \frac{h_{pix}/2}{l}$. Now that the height
+  projected on a pixel from distance $l'$ is known, it is possible to
+  compute the size of an object at the same distance as $h_{obj} =
+  p_{obj}h_{pix}'$, where $p_{obj}$ is the height of the object in
+  pixels. In Tab.~\ref{tab:objects} there are the heights of the three
+  objects computed from the image \texttt{objects\_55mm.jpg}.
+  \begin{table}[h]
+    \centering
+    \begin{tabular}{lrrrr}
+      Object & $l'$ & $h_{pix}'$ & $p_{obj}$ & $h_{obj}$ \\
+      \hline
+      Green duck & \SI{252}{\cm} & \SI{0.177}{\mm} & \SI{458}{px} & \SI{8.12}{\cm} \\
+      Yellow duck & \SI{352}{\cm} & \SI{0.248}{\mm} & \SI{526}{px} & \SI{13.03}{\cm} \\
+      Red bear & \SI{412}{\cm} & \SI{0.290}{\mm} & \SI{425}{px} & \SI{12.32}{\cm}
+    \end{tabular}
+    \caption{Object sizes}
+    \label{tab:objects}
+  \end{table}
+\end{enumerate}
+\section*{Experiment 3}
+The three images number 6, 7 and 8 have the same field of view and it
+is the narrowest among the pictures, so they must be the ones with $f
+= \SI{70}{\mm}$. Looking at the swinging adhesive tape it is possible
+to determine the exposure time: the most blurred picture (n. 7) was
+taken with the longest one, while the least blurred (n. 8) was shot
+with the shortest one. Images number 4 and 5 also have the same focal
+length so they are the two images with $f = \SI{24}{\mm}$. The one
+with a wider aperture has a shorter depth of field so it is image
+number 5 because the vase in the foreground is less focused than in
+the other image, while the other objects are the same. Of the three
+remaining images, the number 1 has the edges of the table that are the
+most parallel, so it is the one with the longest focal length. The
+last two images have the same exposure time so they can be
+distinguished by their brightness: the one with a wider aperture
+(n. 2) is more bright.
+\begin{table}
+  \centering
+  \begin{tabular}{llll}
+    Image & Aperture & Exposure time & Focal length \\
+    \hline
+    Image 1 & f/4.8 & 1/60 s & 35 mm \\
+    Image 2 & f/2.8 & 1/60 s & 6 mm \\
+    Image 3 & f/3.5 & 1/60 s & 13 mm \\
+    Image 4 & f/25 & 1/2 s & 24 mm \\
+    Image 5 & f/3.8 & 1/80 s & 24 mm \\
+    Image 6 & f/14 & 1/10 s & 70 mm \\
+    Image 7 & f/25 & 1/3 s & 70 mm \\
+    Image 8 & f/4.5 & 1/80 s & 70 mm
+  \end{tabular}
+\end{table}
+\end{document}
