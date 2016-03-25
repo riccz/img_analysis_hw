@@ -1,0 +1,90 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{textcomp}
+\usepackage{graphicx}
+
+\definecolor{matlabgreen}{RGB}{28,172,0}
+\definecolor{matlablilas}{RGB}{170,55,241}
+
+\newcommand{\includecode}[1]{\lstinputlisting[caption={\ttfamily #1.m},
+    label={lst:#1}]{matlab/#1.m}}
+\newcommand{\inlinecode}[1]{\lstinline[basicstyle=\ttfamily,keywordstyle={}]{#1}}
+
+\author{Riccardo Zanol}
+\title{Laboratory 2}
+
+\begin{document}
+\lstset{
+  language=Matlab,
+  basicstyle={\ttfamily \footnotesize},
+  breaklines=true,
+  morekeywords={true,false,warning,xlim,ylim},
+  keywordstyle=\color{blue},
+  stringstyle=\color{matlablilas},
+  commentstyle={\color{matlabgreen} \itshape},
+  numberstyle={\ttfamily \tiny},
+  frame=leftline,
+  showstringspaces=false,
+  numbers=left,
+  upquote=true,
+}
+\maketitle
+\section*{Experiment 1}
+\section*{Exercise 2}
+\begin{enumerate}
+\item The histogram of an image is defined as
+  \[ p(r_k) = \frac{n_k}{MN} \]
+  and is computed using the function \inlinecode{histogram}
+  (Listing~\ref{lst:histogram}) by counting the number of pixels with
+  each of the $L=8$ possible intensity values and dividing by the
+  total pixel count. The resulting histograms for the two images
+  \inlinecode{i1} and \inlinecode{i2} are computed in the script
+  \inlinecode{ex2.m} (Listing~\ref{lst:ex2}, lines 6-21) and are displayed in
+  Fig.~\ref{plot:histo_original}.
+  \begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{matlab/histo_original}
+    \caption{Histograms}
+    \label{plot:histo_original}
+  \end{figure}
+\item To transform the histogram of \inlinecode{i1} so that is is
+  equal to that of \inlinecode{i2} it is first necessary to compute
+  the two pixel transformations $T(r_k)$ and $G(r_k)$ that equalize
+  the histograms of each one of the two images. In
+  Listing~\ref{lst:ex2}, lines 23-29 these are computed according to
+  the equation
+  \[ s_k = T(r_k) = (L-1)\sum_{j=0}^kp_r(r_k) . \]
+  Then the transformation to get the specified histogram is computed as
+  \[ z_k = H(r_k) = G^{-1}(T(r_k)) \]
+  where the inversion of $s_k = G(z_k)$ is done by searching for a
+  specific $s_k$ in the vector that contains the values of the
+  function. If no $s_k$ is equal to the searched value, the $z_k$ that
+  maps to the closest value is chosen. In Fig.~\ref{plot:histo_transf}
+  the three transformations $T$, $G$ and $H$ are shown, while in
+  Fig.~\ref{plot:histo_eq} there is the transformed histogram of
+  \inlinecode{i1} compared to its desired shape.
+  \begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{matlab/histo_transf}
+    \caption{Transformations}
+    \label{plot:histo_transf}
+  \end{figure}
+  \begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{matlab/histo_eq}
+    \caption{Equalized histogram}
+    \label{plot:histo_eq}
+  \end{figure}  
+\end{enumerate}
+\includecode{ex2}
+\includecode{histogram}
+\end{document}
