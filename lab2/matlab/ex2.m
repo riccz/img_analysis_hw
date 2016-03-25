@@ -18,7 +18,7 @@ stem(0:L-1,h2);
 ylim([0, 0.3]);
 xlim([0, 7]);
 title('Histogram of i2');
-print 'histo_original', '-depsc';
+print('histo_original', '-depsc');
 
 % Transformations to equalize i1 and i2
 T = zeros(L, 1);
@@ -48,7 +48,7 @@ stairs(0:L-1, H);
 xlim([0,7]);
 ylim([0,7]);
 legend('T', 'G', 'H');
-print 'histo_transf', '-depsc';
+print('histo_transf', '-depsc');
 
 % Equalize i1 like i2
 i1_eq = zeros(8,8);
@@ -73,4 +73,4 @@ stem(0:L-1,h2);
 ylim([0, 0.3]);
 xlim([0, 7]);
 title('Histogram of i2');
-print 'histo_eq', '-depsc';
+print('histo_eq', '-depsc');
