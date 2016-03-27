@@ -39,6 +39,58 @@
 }
 \maketitle
 \section*{Experiment 1}
+\begin{enumerate}
+\item To compute the color coordinates in the XYZ colorspace the
+  following integral must be computed:
+  \[ \beta_k = \int_{350}^{780} C(\lambda)\alpha_k(\lambda) \]
+  where the functions $\alpha_k$ are the three color matching
+  functions $X(\lambda)$, $Y(\lambda)$ and $Z(\lambda)$ of the
+  colorspace. In practice this integral is approximated by computing
+  \[ \beta_k = \sum_{\lambda=400}^{780} \frac{c(\lambda)}{w(\lambda)}\frac{d_{65}(\lambda)}{N} \alpha_k(\lambda) \]
+  where the sum starts from 400 because the colorimeter's output is
+  not very accurate below this wavelength. This equation also takes
+  into account the spectra of the white color and of the illuminant
+  and the normalization factor $N =
+  \sum_{\lambda=400}^{780}d_{65}(\lambda)Y(\lambda)$.
+
+  The script \inlinecode{ex1.m} reads the three CMFs of the XYZ
+  colorspace and the spectrum of the light source from the files
+  \inlinecode{cmf.mat} and \inlinecode{d65.mat} and interpolates them
+  in order to cut them at 400 nm and to have the values of the spectra
+  corresponding to the same $\lambda \text{s}$. Then it reads and
+  interpolates the white and yellow spectra from
+  \inlinecode{macbeth.mat} and it computes the XYZ color coordinates
+  of the yellow. These are $(0.631, 0.672, 0.108)$ that correspond to
+  $(250, 211, 29.5)$ in the sRGB colorspace. They are close to the
+  tabulated values but there is some error.
+\item Repeating the same computations of point 1 using the yellow and
+  white spectra acquired in the laboratory yields the XYZ color
+  coordinates $(0.635, 0.671, 0.142)$. These coordinates correspond in
+  the sRGB colorspace to $(250, 211, 62.6)$, that are very close to
+  the ones computed at point 1 except for the blue component.
+\item To compute the error between the measured and the provided color
+  coordinates it is necessary to convert the measured XYZ colors in
+  the CIELAB colorspace (or in another space that takes into account
+  the McAdam ellipses). The matlab function \inlinecode{xyz2cielab}
+  performs the conversion using the equations
+  \begin{align*}
+    f(t) &= \begin{cases}
+      t^{1/3} & \text{if} \quad t>\left(\frac{6}{29}\right)^3 \\
+      \frac{1}{3}\left(\frac{29}{6}\right)^2t + \frac{4}{29} \quad & \text{otherwise}
+    \end{cases} \\
+    L^* &= 116f\left(\frac{Y}{Y_n}\right)-16 \\
+    a^* &= 500\left(f\left(\frac{X}{X_n}\right) - f\left(\frac{Y}{Y_n}\right)\right) \\
+    b^* &= 200\left(f\left(\frac{Y}{Y_n}\right) - f\left(\frac{Z}{Z_n}\right)\right)
+  \end{align*}
+  where $(X_n, Y_n, Z_n) = (0.950, 1, 1.09)$ are the XYZ coordinates
+  of the reference white.  The euclidean distance computed by
+  \inlinecode{ex1.m} between the measured yellow and the tabulated
+  values is $7.43$ for the specturm read from
+  \inlinecode{macbeth.mat}, while the one read from
+  \inlinecode{acquisition_18_3_2016_a.mat} has distance $8.68$.
+\end{enumerate}
+%\includecode{ex1}
+%\includecode{xyz2cielab}
 \section*{Exercise 2}
 \begin{enumerate}
 \item The histogram of an image is defined as
