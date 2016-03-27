@@ -43,13 +43,12 @@
 \begin{enumerate}
 \item The histogram of an image is defined as
   \[ p(r_k) = \frac{n_k}{MN} \]
-  and is computed using the function \inlinecode{histogram}
-  (Listing~\ref{lst:histogram}) by counting the number of pixels with
-  each of the $L=8$ possible intensity values and dividing by the
-  total pixel count. The resulting histograms for the two images
-  \inlinecode{i1} and \inlinecode{i2} are computed in the script
-  \inlinecode{ex2.m} (Listing~\ref{lst:ex2}, lines 6-21) and are displayed in
-  Fig.~\ref{plot:histo_original}.
+  and is computed using the function \inlinecode{histogram_1} by
+  counting the number of pixels with each of the $L=8$ possible
+  intensity values and dividing by the total pixel count. The
+  resulting histograms for the two images \inlinecode{i1} and
+  \inlinecode{i2} are computed in the script \inlinecode{ex2.m}~(lines
+  6-21) and are displayed in Fig.~\ref{plot:histo_original}.
   \begin{figure}[h]
     \centering
     \includegraphics[width=0.7\textwidth]{matlab/histo_original}
@@ -60,8 +59,8 @@
   equal to that of \inlinecode{i2} it is first necessary to compute
   the two pixel transformations $T(r_k)$ and $G(r_k)$ that equalize
   the histograms of each one of the two images. In
-  Listing~\ref{lst:ex2}, lines 23-29 these are computed according to
-  the equation
+  \inlinecode{ex2.m}~(lines 23-29) these are computed according to the
+  equation
   \[ s_k = T(r_k) = (L-1)\sum_{j=0}^kp_r(r_k) . \]
   Then the transformation to get the specified histogram is computed as
   \[ z_k = H(r_k) = G^{-1}(T(r_k)) \]
@@ -85,6 +84,6 @@
     \label{plot:histo_eq}
   \end{figure}  
 \end{enumerate}
-\includecode{ex2}
-\includecode{histogram}
+%\includecode{ex2}
+%\includecode{histogram}
 \end{document}
