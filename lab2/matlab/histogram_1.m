@@ -1,4 +1,4 @@
-function h = histogram(img, L)
+function h = histogram_1(img, L)
 [M,N] = size(img);
 h = zeros(L, 1);
 for i=1:M

@@ -3,8 +3,8 @@ close all; clear all; clc;
 load 'exercise_3';
 L = 8;
 
-h1 = histogram(i1, L);
-h2 = histogram(i2, L);
+h1 = histogram_1(i1, L);
+h2 = histogram_1(i2, L);
 
 % Plot of the original histograms
 figure;
@@ -59,7 +59,7 @@ for i=1:M
     end
 end
 
-h1_eq = histogram(i1_eq, L);
+h1_eq = histogram_1(i1_eq, L);
 
 % Plot new histograms
 figure;
