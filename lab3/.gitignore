@@ -1,0 +1,6 @@
+*.aux
+*.pdf
+*.out
+*.log
+lab3.zip
+matlab/*.eps
