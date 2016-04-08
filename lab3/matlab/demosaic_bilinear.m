@@ -1,8 +1,8 @@
 function img = demosaic_bilinear(bayer)
-[W,H] = size(bayer);
-img = zeros(W,H,3);
-for i=3:W-2 % Skip a border of 2 pixels
-    for j=3:H-2
+[H,W] = size(bayer);
+img = zeros(H,W,3);
+for i=3:H-2 % Skip a border of 2 pixels
+    for j=3:W-2
         % Green interp
         if mod(i+j, 2) == 0
             img(i,j, 2) = bayer(i,j);

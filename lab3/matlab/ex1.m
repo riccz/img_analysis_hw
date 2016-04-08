@@ -1,7 +1,6 @@
 close all; clear all; clc;
 
 test_imgs = {'kodim01.png' 'kodim05.png' 'kodim13.png' 'kodim19.png'};
-%test_imgs = {'small_kodim01.png' 'small_kodim05.png' 'small_kodim13.png' 'small_kodim19.png'};
 
 % Perform the demosaicing
 demosaic_imgs = cell(1, length(test_imgs));
@@ -30,10 +29,10 @@ for i=1:length(test_imgs)
     matlab_demosaic_lab = applycform(matlab_demosaic_imgs{i}, C);
     
     % Exclude a 2 pixel border from the comparison
-    [W, H, ~] = size(test_img);
-    test_img_lab = test_img_lab(3:W-2,3:H-2,:);
-    demosaic_lab = demosaic_lab(3:W-2,3:H-2,:);
-    matlab_demosaic_lab = matlab_demosaic_lab(3:W-2,3:H-2,:);
+    [H, W, ~] = size(test_img);
+    test_img_lab = test_img_lab(3:H-2,3:W-2,:);
+    demosaic_lab = demosaic_lab(3:H-2,3:W-2,:);
+    matlab_demosaic_lab = matlab_demosaic_lab(3:H-2,3:W-2,:);
     
     mean_dists(i) = mean(mean(sqrt(sum((demosaic_lab - test_img_lab).^2, 3))));
     matlab_mean_dists(i) = mean(mean(sqrt(sum((matlab_demosaic_lab - test_img_lab).^2, 3))));
