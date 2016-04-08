@@ -1,0 +1,24 @@
+#!/bin/bash
+# La prima riga è quella che specifica che interprete utilizzare, va assolutamente messa!!
+#
+# Specifico il progetto associato - controlla nella pagina del blade sul sito del dei quale è il tuo livello
+#
+#
+#
+# Genera output ed errori nella cartella corrente. il file di uscita sarà test.job.oNumeroLavoro, quello degli
+#errori sarà invece test.job.eNumeroLavoro
+#
+#$ -cwd -m ea 
+#
+# Non redirigo l'output: ogni esecuzione generera'
+# un file di output diverso
+#
+# Voglio ricevere una mail quando il job termina
+# o in caso venga abortito
+#
+#     -m ea
+pushd matlab
+matlab -nodesktop -nosplash -r ex1,ex2
+popd
+
+# assumendo che NomeScriptDaEseguire.m sia nella cartella da cui lanci il comando, altrimenti ci aggiungi il percorso
