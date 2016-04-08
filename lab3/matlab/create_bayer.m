@@ -26,18 +26,18 @@ bayer3 = uint8(bayer3);
 for y= 1:2:h
     for x= 1:2:w
         bayer(y,x) =  img(y,x,2);
-        bayer(y+1,x) = img(y,x,3);
-        bayer(y,x+1) = img(y,x,1);
-        bayer(y+1,x+1) = img(y,x,2);
+        bayer(y+1,x) = img(y+1,x,3);
+        bayer(y,x+1) = img(y,x+1,1);
+        bayer(y+1,x+1) = img(y+1,x+1,2);
     end
 end
 
 for y= 1:2:h
     for x= 1:2:w
         bayer3(y,x,:) = [0 img(y,x,2) 0 ];
-        bayer3(y+1,x,:) = [0 0 img(y,x,3) ];
-        bayer3(y,x+1,:) = [ img(y,x,1) 0 0 ];
-        bayer3(y+1,x+1,:) = [0 img(y,x,2) 0 ];
+        bayer3(y+1,x,:) = [0 0 img(y+1,x,3) ];
+        bayer3(y,x+1,:) = [ img(y,x+1,1) 0 0 ];
+        bayer3(y+1,x+1,:) = [0 img(y+1,x+1,2) 0 ];
     end
 end
 
