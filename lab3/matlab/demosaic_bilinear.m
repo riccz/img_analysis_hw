@@ -38,4 +38,5 @@ for i=3:W-2 % Skip a border of 2 pixels
         end
     end
 end
+img = img ./ 255; % Return an image with pixels in [0,1]
 end
