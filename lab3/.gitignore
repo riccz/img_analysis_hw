@@ -4,4 +4,6 @@
 *.log
 lab3.zip
 matlab/*.eps
+matlab/*.png
+matlab/*.asv
 images
