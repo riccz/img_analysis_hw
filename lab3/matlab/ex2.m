@@ -11,7 +11,7 @@ for i=1:length(dng_imgs)
     bayer = [zeros(W, 1), bayer, zeros(W, 1)];
     
     bayer = uint8(bayer .* 255); % Convert to uint8 to use the same code
-    demosaic_img = demosaic_bilinear(bayer);
+    demosaic_img = demosaic_linear(bayer);
     matlab_demosaic_img = double(demosaic(bayer, 'grbg')) ./ 255;
     
     % Remove the extra columns
