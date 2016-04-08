@@ -1,7 +1,7 @@
 all: lab3.zip
 
-lab3.zip: lab3.pdf matlab/*.m matlab/*.mat
-	zip lab3.zip lab3.pdf matlab/*.m matlab/*.mat
+lab3.zip: lab3.pdf matlab/*.m
+	zip lab3.zip lab3.pdf matlab/*.m
 
 %.pdf: %.tex clean
 	pdflatex $<
