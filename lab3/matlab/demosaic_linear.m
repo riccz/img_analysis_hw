@@ -1,4 +1,4 @@
-function img = demosaic_bilinear(bayer)
+function img = demosaic_linear(bayer)
 [H,W] = size(bayer);
 img = zeros(H,W,3);
 for i=3:H-2 % Skip a border of 2 pixels

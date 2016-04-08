@@ -9,7 +9,7 @@ for i=1:length(test_imgs)
     fname = ['../images/' test_imgs{i}];
     [bayer, bayer3] = create_bayer(fname);
     
-    demosaic_imgs{i} = demosaic_bilinear(bayer);
+    demosaic_imgs{i} = demosaic_linear(bayer);
     matlab_demosaic_imgs{i} = double(demosaic(bayer, 'grbg')) ./ 255;
     
     imwrite(demosaic_imgs{i}, ['demosaic_' test_imgs{i}]);
