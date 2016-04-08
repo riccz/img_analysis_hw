@@ -1,8 +1,6 @@
 close all; clear all; clc;
 
-dng_imgs = {'DEI_park.dng' 'macbeth_gray.dng' 'poster.dng' ...
-    'students2.dng' 'macbeth_color.dng' 'map.dng' ...
-    'students1.dng' 'students3.dng'};
+dng_imgs = {'DEI_park.dng' 'macbeth_color.dng' 'students2.dng'};
 
 for i=1:length(dng_imgs)
     fname = ['../images/' dng_imgs{i}];
