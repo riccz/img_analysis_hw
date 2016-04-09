@@ -42,7 +42,7 @@
 \maketitle
 \section*{Experiment 1}
 In the matlab script \inlinecode{ex1.m} each one of the provided
-\inlinecode{kodim_*.png} images is mosaicized by
+\inlinecode{kodim_*.png} images is mosaiced by
 \inlinecode{create_bayer}, that produces an image where the intensity
 of each pixel represents only one color component according to the
 Bayer pattern ``GRBG'', then the function \inlinecode{demosaic_linear}
@@ -51,13 +51,13 @@ pixels, depending on the location, to determine the value of each
 unknown color component. This function ignores a border of two pixels
 around the image and sets it to $(0,0,0)$ to avoid having to handle
 this special case in the code.  The script also performs the
-demosaicing using the builtin matlab function \inlinecode{demosaic}
+demosaicing using the built-in matlab function \inlinecode{demosaic}
 which uses a different algorithm, the gradient-corrected bilinear
 interpolation, that exploits the correlation between the color
 components and corrects the linearly interpolated value of a pixel
 with the gradient (of a different color) in that pixel.
 
-After having being demosaicized by each one of the two algortihms the
+After having being demosaiced by each one of the two algorithms the
 images are converted into the CIELAB color space to allow them to be
 compared to the original images and the mean squared error of the two
 algorithms is calculated. The MSE is computed by taking the distance
@@ -106,9 +106,38 @@ white fence that are the result of the interpolation.
   \includegraphics[width=.8\linewidth]{matlab_demosaic_kodim19_artifact}
   \caption{\inlinecode{demosaic}}
 \end{subfigure}
-\caption{Detail of \inlinecode{kodim_19.png} after the demosaicizing}
+\caption{Detail of \inlinecode{kodim_19.png} after the demosaicing}
 \label{fig:artifact}
 \end{figure}
 
 \section*{Experiment 2}
+The matlab script \inlinecode{ex2.m} applies the same two demosaicing
+algorithms to some images acquired from a reflex camera. This time,
+since it starts from the raw sensor data it has to perform some
+additional steps to get an output that can be compared to the JPEG
+files produced by the camera. The script reads the DNG files using the
+provided function \inlinecode{read_dng}, which also performs the
+linearization and white balancing of the image using the meta-data
+stored with it, then it applies the same two demosaicing algorithms
+of experiment 1.
+
+The raw data of the image is stored according to a ``RGGB'' Bayer
+pattern so the script adds one column of zeros at the beginning and at
+the end of the image, in this way it shifts the pattern horizontally
+by one pixel and it becomes the ``GRBG'' pattern that the function
+\inlinecode{demosaic_linear} expects. The extra columns do not affect
+the demosaicing results because this function skips a two pixel wide
+border around the image.  The built-in \inlinecode{demosaic} function
+could work directly on the ``RGGB'' pattern, but since the two columns
+must be added anyway the script uses it in the same way of experiment
+1. This function also requires the input pixels to be of type
+\inlinecode{uint8} so the image is converted before the demosaicing.
+
+After the demosaicing step, the image is post-processed with the
+provided \inlinecode{post_process} function that normalizes the image
+intensity and applies a gamma correction.
+
+
+
+
 \end{document}
