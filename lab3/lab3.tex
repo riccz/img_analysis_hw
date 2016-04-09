@@ -138,7 +138,7 @@ provided \inlinecode{post_process} function that normalizes the image
 intensity and applies a gamma correction.
 
 Comparing the results with the JPEG files produced by the camera it
-can be seen that the steps that are skept in the raw image processing
+can be seen that the steps that are skipped in the raw image processing
 affect the color, in particular the \inlinecode{post_process} function
 does not convert the image from the color space of the camera to
 sRGB. As can be seen in Fig.~\ref{fig:chart} the result images appear
@@ -166,7 +166,7 @@ to have a much lower contrast than the camera JPEG file.
 The demosaicing performed by the matlab script also leaves a lot of
 artifacts, especially in the dark areas as can be seen from
 Fig.~\ref{fig:dark_artifacts}. In this case the linear interpolation
-algorithm appears to produce slighlty better images than the gradient
+algorithm appears to produce slightly better images than the gradient
 corrected one, but they are both very noisy compared to the camera's
 processed images.
 \begin{figure}[htbp]
