@@ -18,7 +18,11 @@ for i=1:length(dng_imgs)
     demosaic_img = demosaic_img(:, 2:H+1, :);
     matlab_demosaic_img = matlab_demosaic_img(:, 2:H+1, :);
     
-    imwrite(demosaic_img, ['demosaic_' dng_imgs{i} '.tiff']);
-    imwrite(matlab_demosaic_img, ['matlab_demosaic_' dng_imgs{i} '.tiff']);
+    % Postprocessing
+    final_img = post_process(demosaic_img);
+    matlab_final_img = post_process(matlab_demosaic_img);
+    
+    imwrite(final_img, ['demosaic_' dng_imgs{i} '.tiff']);
+    imwrite(matlab_final_img, ['matlab_demosaic_' dng_imgs{i} '.tiff']);
     fprintf([dng_imgs{i} ' OK\n']);
 end
