@@ -113,7 +113,7 @@ white fence that are the result of the interpolation.
 \section*{Experiment 2}
 The matlab script \inlinecode{ex2.m} applies the same two demosaicing
 algorithms to some images acquired from a reflex camera. This time,
-since it starts from the raw sensor data it has to perform some
+since it starts from the raw sensor data, it has to perform some
 additional steps to get an output that can be compared to the JPEG
 files produced by the camera. The script reads the DNG files using the
 provided function \inlinecode{read_dng}, which also performs the
@@ -137,7 +137,56 @@ After the demosaicing step, the image is post-processed with the
 provided \inlinecode{post_process} function that normalizes the image
 intensity and applies a gamma correction.
 
-
-
-
+Comparing the results with the JPEG files produced by the camera it
+can be seen that the steps that are skept in the raw image processing
+affect the color, in particular the \inlinecode{post_process} function
+does not convert the image from the color space of the camera to
+sRGB. As can be seen in Fig.~\ref{fig:chart} the result images appear
+to have a much lower contrast than the camera JPEG file.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}{.33\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{demosaic_macbeth_color_small}
+  \caption{\inlinecode{demosaic_linear}}
+\end{subfigure}%
+\begin{subfigure}{.33\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{matlab_demosaic_macbeth_color_small}
+  \caption{\inlinecode{demosaic}}
+\end{subfigure}%
+  \begin{subfigure}{.33\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{camera_macbeth_color_small}
+  \caption{JPEG from the camera}
+\end{subfigure}
+\caption{Comparison of the color chart}
+\label{fig:chart}
+\end{figure}
+The demosaicing performed by the matlab script also leaves a lot of
+artifacts, especially in the dark areas as can be seen from
+Fig.~\ref{fig:dark_artifacts}. In this case the linear interpolation
+algorithm appears to produce slighlty better images than the gradient
+corrected one, but they are both very noisy compared to the camera's
+processed images.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}{.33\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{demosaic_students2_detail}
+  \caption{\inlinecode{demosaic_linear}}
+\end{subfigure}%
+\begin{subfigure}{.33\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{matlab_demosaic_students2_detail}
+  \caption{\inlinecode{demosaic}}
+\end{subfigure}%
+  \begin{subfigure}{.33\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{camera_students2_detail}
+  \caption{JPEG from the camera}
+\end{subfigure}
+\caption{Comparison of a detail from \inlinecode{students2.dng}}
+\label{fig:dark_artifacts}
+\end{figure}
 \end{document}
