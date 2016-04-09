@@ -4,7 +4,7 @@ function [bayer] = read_dng(filename)
 bayer_type = 'rggb';
 
 % - - - Reading file - - -
-    warning off MATLAB:tifflib:TIFFReadDirectory:libraryWarning
+    warning off MATLAB:tifflib:TIFFReadDirectory;
     t = Tiff(filename,'r');
     offsets = getTag(t,'SubIFD');
     setSubDirectory(t,offsets(1));
