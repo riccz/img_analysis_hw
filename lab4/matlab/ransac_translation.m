@@ -5,10 +5,12 @@ last_compatibles_count = 0;
 last_mean_deltax = NaN;
 last_mean_deltay = NaN;
 for i=1:n
-    random_m_i = m_i(ceil(rand(1)*length(m_i)));
-    delta = loc_1(random_m_i,1:2) - loc_2(matches(random_m_i),1:2);
-    all_delta = loc_1(m_i,1:2) - loc_2(matches(m_i),1:2);
-    good_delta_i = find(and(abs(all_delta(:,1) - delta(1)) <= thresh_y, abs(all_delta(:,2) - delta(2)) <= thresh_x));
+    random_m_i = m_i(ceil(rand(1)*(length(m_i)-1))+1);
+    delta = loc_2(matches(random_m_i),1:2) - loc_1(random_m_i,1:2);
+    all_delta = loc_2(matches(m_i),1:2) - loc_1(m_i,1:2);
+    good_delta_i = find(and(...
+        abs(all_delta(:,1) - delta(1)) <= thresh_y, ...
+        abs(all_delta(:,2) - delta(2)) <= thresh_x));
     good_delta = all_delta(good_delta_i,1:2);
     good_count = size(good_delta, 1);
     if good_count > last_compatibles_count
