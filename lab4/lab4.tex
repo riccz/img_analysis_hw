@@ -1,0 +1,44 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{textcomp}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage[section]{placeins}
+
+\definecolor{matlabgreen}{RGB}{28,172,0}
+\definecolor{matlablilas}{RGB}{170,55,241}
+
+\newcommand{\includecode}[1]{\lstinputlisting[caption={\ttfamily #1.m},label={lst:#1}]{matlab/#1.m}}
+
+\newcommand{\inlinecode}[1]{\lstinline[basicstyle=\ttfamily,keywordstyle={}]{#1}}
+
+\author{Riccardo Zanol}
+\title{Laboratory 4}
+
+\begin{document}
+\lstset{
+  language=Matlab,
+  basicstyle={\ttfamily \footnotesize},
+  breaklines=true,
+  morekeywords={true,false,warning,xlim,ylim},
+  keywordstyle=\color{blue},
+  stringstyle=\color{matlablilas},
+  commentstyle={\color{matlabgreen} \itshape},
+  numberstyle={\ttfamily \tiny},
+  frame=leftline,
+  showstringspaces=false,
+  numbers=left,
+  upquote=true,
+}
+\maketitle
+
+\end{document}

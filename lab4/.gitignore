@@ -1,0 +1,10 @@
+*.aux
+*.pdf
+*.out
+*.log
+lab*.zip
+matlab/*.eps
+matlab/*.png
+matlab/*.tiff
+matlab/*.asv
+lab_22_4_16_manual
