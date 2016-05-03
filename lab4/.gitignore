@@ -7,4 +7,8 @@ matlab/*.eps
 matlab/*.png
 matlab/*.tiff
 matlab/*.asv
+matlab/cil_imgs/
+matlab/*.bmp
+matlab/*.key
+matlab/*.pgm
 lab_22_4_16_manual
