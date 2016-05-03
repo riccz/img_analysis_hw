@@ -23,9 +23,9 @@ image = imread(imageFile);
 
 % If you have the Image Processing Toolbox, you can uncomment the following
 %   lines to allow input of color images, which will be converted to grayscale.
-if isrgb(image)
-   image = rgb2gray(image);
-end
+% if isrgb(image)
+%    image = rgb2gray(image);
+% end
 
 [rows, cols] = size(image); 
 
