@@ -1,13 +1,15 @@
 all: lab4.zip
 
-lab4.zip: lab4.pdf matlab/*.m
+lab4.zip: clean images lab4.pdf matlab/*.m
 	zip lab4.zip lab4.pdf matlab/*.m
 
-%.pdf: %.tex matlab/cil_imgs/c6.png clean
+%.pdf: %.tex
 	pdflatex $<
 	pdflatex $<
 
-matlab/cil_imgs/%.png: matlab/cil_imgs/%.bmp
+images: matlab/cil_imgs/c6.png matlab/panoramic_img.png
+
+%.png: %.bmp
 	convert $< $@
 
 clean:
@@ -15,6 +17,8 @@ clean:
 	rm *.aux || true
 	rm *.out || true
 	rm matlab/*.pdf || true
+	rm matlab/*.png || true
+	rm matlab/cil_imgs/*.png || true
 	rm lab*.zip || true
 
-.PHONY: clean all
+.PHONY: clean all images
