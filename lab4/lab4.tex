@@ -1,25 +1,39 @@
-\documentclass{article}
+\documentclass[a4paper,oneside]{article}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 
+\usepackage[margin=2.54cm]{geometry}
 \usepackage{amsmath}
 \usepackage{siunitx}
-\usepackage{hyperref}
 \usepackage{listings}
 \usepackage{color}
 \usepackage{textcomp}
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage[section]{placeins}
+\usepackage{hyperref}
 
 \definecolor{matlabgreen}{RGB}{28,172,0}
 \definecolor{matlablilas}{RGB}{170,55,241}
 
 \newcommand{\includecode}[1]{\lstinputlisting[caption={\ttfamily #1.m},label={lst:#1}]{matlab/#1.m}}
+\newcommand{\inlinecode}[1]{\lstinline[basicstyle=\ttfamily,keywordstyle={},stringstyle={},commentstyle={\itshape}]{#1}}
 
-\newcommand{\inlinecode}[1]{\lstinline[basicstyle=\ttfamily,keywordstyle={}]{#1}}
+\renewcommand{\vec}[1]{\underline{#1}}
+\renewcommand{\Re}[1]{\operatorname{Re}\left[#1\right]}
+\newcommand{\E}[1]{\operatorname{E}\left[#1\right]}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\F}[1]{\operatorname{\mathcal{F}}\left[#1\right]}
+\newcommand{\ceil}[1]{\left\lceil#1\right\rceil}
+\newcommand{\floor}[1]{\left\lfloor#1\right\rfloor}
+\newcommand{\Prob}[1]{\operatorname{P}\left[#1\right]}
+\newcommand{\ProbC}[2]{\operatorname{P}\left[#1\middle|#2\right]}
+\newcommand{\ind}[1]{\operatorname{\mathbbm{1}}\left\{#1\right\}}
+\newcommand{\distr}[0]{\sim}
+\newcommand{\unif}[1]{\mathcal{U}_{#1}}
 
 \author{Riccardo Zanol}
 \title{Laboratory 4}
@@ -40,5 +54,42 @@
   upquote=true,
 }
 \maketitle
+
+To build a panoramic photo it is first necessary to convert the
+acquired images in cilindrical coordinates, to do this the provided
+function \inlinecode{projectIC} is used. The function converts the
+source image to grayscale and then applies the change of coordinates
+\begin{align*}
+  x' &= r\tan^{-1}\frac{x}{d} \\
+  y' &= y\frac{r}{d}\cos\frac{x'}{r}
+\end{align*}
+point by point, where $d = \frac{W}{2}\frac{1}{\tan\alpha}$ and $r =
+\frac{d}{\cos\alpha}$, using half the FOV of the camera as the angle
+$\alpha = \SI{33}{\degree}$. One of the converted images is shown in
+Fig.~\ref{fig:cil}.
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.9\textwidth]{matlab/cil_imgs/c6}
+  \caption{Image number 6 conerted into cilindrical coordinates}
+  \label{fig:cil}
+\end{figure}
+
+After all the images have been converted in cilindrical coordinates
+their SIFT features and descriptors are computed using the
+\inlinecode{sift} function. Then the \inlinecode{match2} function
+finds the matching features between two consecutive images by looking
+for the closest value of the descriptor and keeping the match when the
+distance is closer than \inlinecode{threshold} times the distance form
+the second closest descriptor. The value used for the threshold is
+$0.7$, and an example of the found features is shown in Fig.~\ref{fig:match}.
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{matlab/saved_match}
+  \caption{Matches between images number 6 and number 7}
+  \label{fig:match}
+\end{figure}
+As can be seen the matched features are moslty correct, but there are
+some errors on the windows, where there are lots of similar regions,
+and some wrong matches on completely unrelated points.
 
 \end{document}

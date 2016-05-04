@@ -56,6 +56,10 @@ if show
         end
     end
     hold off;
+    if strcmp(show, 'save')
+        set(gcf, 'PaperPosition', [0 0 size(im3,2)/2 size(im3,1)/2]);
+        print('saved_match', '-depsc');
+    end
 end
 num = sum(match > 0);
 fprintf('Found %d matches.\n', num);

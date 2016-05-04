@@ -26,7 +26,12 @@ for i=1:11
     [img1, descr1, loc1] = sift(fname1);
     [img2, descr2, loc2] = sift(fname2);
     
-    [match, num] = match2(img1, descr1, loc1, img2, descr2, loc2, match_thresh);
+    if i==6
+        show = 'save';
+    else
+        show = false;
+    end
+    [match, num] = match2(img1, descr1, loc1, img2, descr2, loc2, match_thresh, show);
     
     [deltax, deltay, compat_count] = ransac_translation(loc1, loc2, match, ransac_n, ransac_thresh_x, ransac_thresh_y);
     deltas(i+1,:) = [deltax, deltay];
