@@ -92,5 +92,22 @@ As can be seen the matched features are moslty correct, but there are
 some errors on the windows, where there are lots of similar regions,
 and some wrong matches on completely unrelated points.
 
+From the matching features the function
+\inlinecode{ransac_translation} estimates the translation that
+occurred between each pair of consecutive images. This function
+randomly selects a pair of matching features, computes the difference
+between their coordiantes $(\hat{\Delta x}, \hat{\Delta y})$ and then
+counts the feature pairs that are compatible with this translation by
+checking wether $\abs{\Delta x_i - \hat{\Delta x}} \leq
+\mathit{thresh\_x}$ and $\abs{\Delta y_i - \hat{\Delta y}} \leq
+\mathit{thresh\_y}$. The two thresholds chosen are $\mathit{thresh\_x}
+= \mathit{thresh\_y} = 5$.
 
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{matlab/panoramic_img}
+  \caption{Panoramic image}
+  \label{fig:panoramic}
+\end{figure}
 \end{document}
