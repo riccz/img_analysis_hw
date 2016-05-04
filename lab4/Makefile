@@ -3,9 +3,12 @@ all: lab4.zip
 lab4.zip: lab4.pdf matlab/*.m
 	zip lab4.zip lab4.pdf matlab/*.m
 
-%.pdf: %.tex clean
+%.pdf: %.tex matlab/cil_imgs/c6.png clean
 	pdflatex $<
 	pdflatex $<
+
+matlab/cil_imgs/%.png: matlab/cil_imgs/%.bmp
+	convert $< $@
 
 clean:
 	rm *.pdf || true
