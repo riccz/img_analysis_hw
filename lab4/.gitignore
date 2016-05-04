@@ -2,6 +2,8 @@
 *.pdf
 *.out
 *.log
+*.bak
+*.bmp
 lab*.zip
 matlab/*.eps
 matlab/*.png
