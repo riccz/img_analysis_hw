@@ -113,5 +113,7 @@ the $y$ direction even if there is in some images a $\Delta y$ of 1 or
 2 pixels. The resulting image is saved in
 \inlinecode{panoramic_img.bmp}. Some of the images do not merge
 correctly for every set of parameters tried, for example in the images
-5 and 6 the estimated translation is too small.
+5 and 6 the estimated translation is always too small. Even with a
+smaller threshold for the matching and an increased iteration count
+for the RANSAC the translation was not estimated correctly.
 \end{document}
