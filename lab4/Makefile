@@ -1,7 +1,8 @@
 all: lab4.zip
 
 lab4.zip: clean images lab4.pdf matlab/*.m
-	zip lab4.zip lab4.pdf matlab/*.m
+	cp matlab/panoramic_img.bmp ./
+	zip lab4.zip lab4.pdf matlab/*.m panoramic_img.bmp
 
 %.pdf: %.tex
 	pdflatex $<

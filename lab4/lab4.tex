@@ -56,9 +56,9 @@
 \maketitle
 
 To build a panoramic photo it is first necessary to convert the
-acquired images in cilindrical coordinates, to do this the provided
+acquired images in cylindrical coordinates, to do this the provided
 function \inlinecode{projectIC} is used. The function converts the
-source image to grayscale and then applies the change of coordinates
+source image to gray-scale and then applies the change of coordinates
 \begin{align*}
   x' &= r\tan^{-1}\frac{x}{d} \\
   y' &= y\frac{r}{d}\cos\frac{x'}{r}
@@ -70,11 +70,11 @@ Fig.~\ref{fig:cil}.
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.7\textwidth]{matlab/cil_imgs/c6}
-  \caption{Image number 6 conerted into cilindrical coordinates}
+  \caption{Image number 6 converted into cylindrical coordinates}
   \label{fig:cil}
 \end{figure}
 
-After all the images have been converted in cilindrical coordinates
+After all the images have been converted in cylindrical coordinates
 their SIFT features and descriptors are computed using the
 \inlinecode{sift} function. Then the \inlinecode{match2} function
 finds the matching features between two consecutive images by looking
@@ -88,7 +88,7 @@ $0.7$, and an example of the found features is shown in Fig.~\ref{fig:match}.
   \caption{Matches between images number 6 and number 7}
   \label{fig:match}
 \end{figure}
-As can be seen the matched features are moslty correct, but there are
+As can be seen the matched features are mostly correct, but there are
 some errors on the windows, where there are lots of similar regions,
 and some wrong matches on completely unrelated points.
 
@@ -96,18 +96,22 @@ From the matching features the function
 \inlinecode{ransac_translation} estimates the translation that
 occurred between each pair of consecutive images. This function
 randomly selects a pair of matching features, computes the difference
-between their coordiantes $(\hat{\Delta x}, \hat{\Delta y})$ and then
+between their coordinates $(\hat{\Delta x}, \hat{\Delta y})$ and then
 counts the feature pairs that are compatible with this translation by
-checking wether $\abs{\Delta x_i - \hat{\Delta x}} \leq
+checking whether $\abs{\Delta x_i - \hat{\Delta x}} \leq
 \mathit{thresh\_x}$ and $\abs{\Delta y_i - \hat{\Delta y}} \leq
 \mathit{thresh\_y}$. The two thresholds chosen are $\mathit{thresh\_x}
-= \mathit{thresh\_y} = 5$.
+= \mathit{thresh\_y} = 20$. This is repeated for $n=100$ iterations,
+the translation with the most compatible matches is kept and the
+estimated translation is the mean between all the compatible
+translations.
 
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{matlab/panoramic_img}
-  \caption{Panoramic image}
-  \label{fig:panoramic}
-\end{figure}
+At the end the images are merged together by cropping half of the
+overlapping region from each image and appending them using
+\inlinecode{appendimages}. The translation is assumed to be zero in
+the $y$ direction even if there is in some images a $\Delta y$ of 1 or
+2 pixels. The resulting image is saved in
+\inlinecode{panoramic_img.bmp}. Some of the images do not merge
+correctly for every set of parameters tried, for example in the images
+5 and 6 the estimated translation is too small.
 \end{document}
