@@ -7,14 +7,12 @@ h = v_obj.Height;
 w = v_obj.Width;
 f_rate = v_obj.FrameRate;
 
-f_rate = f_rate * 4;
-
 MAX_FRAMES = 400;
 
 mov = zeros(h,w,MAX_FRAMES, 'uint8'); % 2D grayscale + time
 k=0; %index of last read frame
 while hasFrame(v_obj) && k < MAX_FRAMES
-    k=k+1;        
+    k=k+1;
     vidFrame = readFrame(v_obj);
     mov(:,:,k) = rgb2gray(vidFrame);
 end
@@ -32,4 +30,5 @@ for i=2:k
 end
 
 % play the video
+implay(mov, f_rate);
 implay(moving, f_rate);
