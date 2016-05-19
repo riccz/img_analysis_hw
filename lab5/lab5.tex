@@ -61,8 +61,8 @@ applying a threshold:
 \begin{align}
   \rho_k(x,y) &= I_k(x,y) - I_{k-1}(x,y) \\
   m_k(x,y) &= \begin{cases}
-    255 \qquad \rho_k^2(x,y) > T_1 \\
-    0 \qquad \text{otherwise}
+    255 & \rho_k^2(x,y) > T_1 \\
+    0 & \text{otherwise}
     \end{cases} .
 \end{align}
 By visualizing the video consisting of the moving pixels $m_k(x,y)$ it
@@ -77,9 +77,9 @@ small regions of pixels that are considered moving due to the noise
 and the refection in the pane glass is detected but is not
 distinguishable from these false movements.  Since this algorithm uses
 only the previous frame it stops to detected the chair as a moving
-object as soon as it becomes still.  Since this algorithm is unable
-to detect movement in uniform regions the pixels that are moving
-correspond to the contours of the moving objects.
+object as soon as it becomes still.  Since this algorithm is unable to
+detect movement in uniform regions the pixels that are moving
+correspond to the contours of the people and objects that are moving.
 
 An example of the detected motion is shown in Fig.\ref{fig:thresh},
 for comparison the original frame and its predecessor are shown in
@@ -115,8 +115,8 @@ the background and detects a moving pixel when it's above a threshold:
   B_k(x,y) &= \alpha I_{k-1}(x,y) + (1-\alpha)B_{k-1}(x,y) \\
   \rho_k(x,y) &= I_k(x,y) - B_k(x,y) \\
   m_k(x,y) &= \begin{cases}
-    255 \qquad \rho_k^2(x,y) > T_2 \\
-    0 \qquad \text{otherwise}
+    255  & \rho_k^2(x,y) > T_2 \\
+    0  & \text{otherwise}
     \end{cases} .
 \end{align}
 Trying various values for the learning rate $\alpha \in (0,1)$ it can
@@ -125,12 +125,13 @@ like the simple threshold algorithm because the background weights
 more the most recent image instead of the saved background. As
 $\alpha$ becomes closer to zero the background incorporates more
 slowly the new frames. This causes the detection of some trails behind
-the moving objects as can be seen in Fig.\ref{fig:back} and also the
+the moving person as can be seen in Fig.\ref{fig:back} and also the
 detection of the changes in exposure time as motion. With the
 parameters $\alpha = 0.5$ and $T_2 = 130$ we get reasonable
 performances, fast movements still leave a trail behind them, but the
-change in exposure times are not detected anymore.
-
+changes in exposure time are not detected anymore. This time the chair
+is detected as a moving object for a little bit of time after it has
+stopped because it must be incorporated into the background model.
 \begin{figure}[htbp]
   \centering
   \begin{subfigure}{0.3\textwidth}
@@ -154,4 +155,55 @@ change in exposure times are not detected anymore.
   \caption{Example of the background modeling algorithm}
 \end{figure}
 
+\section*{Probabilistic approach}
+The probabilistic approach uses $R$ previous frames to build a
+Gaussian-mixture model, with all components with zero mean and
+variance $\sigma^2$, of the intensity of each pixel and detects a
+moving pixel when the probability that it's part of the background
+falls below a threshold:
+\begin{align}
+  P_{bgr}(I(x,y)) &= \frac{1}{R} \sum_{i=1}^R e^{-\frac{(I_k(x,y)-I_{k-i}(x,y))^2}{2\sigma^2}} \\
+  m_k(x,y) &= \begin{cases}
+    255  & P_{bgr} \leq T_3 \\
+    0  & \text{otherwise}
+    \end{cases} . 
+\end{align}
+In this algorithm the parameter $R$ controls the number of components
+of the Gaussian mixture and it causes an effect similar to the
+learning rate of the previous algorithm: when it increases some trails
+start to appear behind the moving objects, while if it decreases there
+are no trails but the algorithm begins to detect some noise as
+motion. The variance $\sigma^2$, instead, controls the level of detail
+of the detected motion: when it is low the algorithm detects very
+small movements but also a lot of noise, when it is high only the
+biggest movements are detected.
+
+If the parameters are set to $T_3 = 0.1$, $\sigma^2 = 50$ and $R=6$
+the motion is detected better than with the other two approaches: the
+trails left by the walking person are not visible anymore, the changes
+in exposure time do not trigger the detection of motion and there is a
+very limited amount of noise. In Fig.~\ref{fig:prob} there is the same
+example shown for the previous algorithm.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{matlab/fast_motion_orig_prev}
+    \caption{Previous frame}
+    \label{fig:prob_orig_prev}
+  \end{subfigure}%
+  \begin{subfigure}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{matlab/fast_motion_orig}
+    \caption{Current frame}
+    \label{fig:prob_orig}
+  \end{subfigure}%
+  \begin{subfigure}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{matlab/fast_motion_prob}
+    \caption{Detected motion}
+    \label{fig:prob}
+  \end{subfigure}%
+  \caption{Example of the probabilistic approach}
+\end{figure}
 \end{document}

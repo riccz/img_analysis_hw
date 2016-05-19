@@ -23,9 +23,9 @@ fprintf('%d frames read \n', k);
 mov = mov(:,:,1:k); %delete unused matrix part to save memory
 
 % Params
-sigma2 = 100;
-R = 40;
-threshold = 0.75;
+sigma2 = 50;
+R = 6;
+threshold = 0.1;
 
 G = @(diff) exp(-double(diff).^2 ./ (2*sigma2));
 
@@ -40,5 +40,10 @@ for j=R+1:k
     end
    moving(:,:,j) = (probs <= threshold) .* 255;
 end
+
+%imwrite(mov(:,:,56), 'fast_motion_orig_prev.png');
+%imwrite(mov(:,:,57), 'fast_motion_orig.png');
+imwrite(moving(:,:,57), 'fast_motion_prob.png');
+
 
 implay(moving);
