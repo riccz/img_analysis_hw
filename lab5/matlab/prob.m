@@ -1,6 +1,4 @@
-close all;
-clear all;
-clc;
+close all; clear all; clc;
 
 v_obj = VideoReader('../video/chair.avi');
 
@@ -25,23 +23,22 @@ fprintf('%d frames read \n', k);
 mov = mov(:,:,1:k); %delete unused matrix part to save memory
 
 % Params
-alpha = 0.1;
-threshold = 100;
+sigma2 = 100;
+R = 40;
+threshold = 0.75;
 
-background = zeros(h,w,k,'uint8');
-background(:,:,1) = mov(:,:,1);
+G = @(diff) exp(-double(diff).^2 ./ (2*sigma2));
+
+
 moving = zeros(h,w,k,'uint8');
-for i=2:k
-    background(:,:,i) = alpha .* mov(:,:,i-1) + (1-alpha) .* background(:,:,i-1);
-    diff = mov(:,:,i) - background(:,:,i);
-    moving(:,:,i) = (diff.^2 > threshold) .* 255;
+% Skip the first R frames: too few previous I_k-i
+for j=R+1:k
+    probs = zeros(h, w, 'double');
+    for i=1:R
+    diff = mov(:,:,j) - mov(:,:,j-i);
+    probs = probs + G(diff) ./ R;
+    end
+   moving(:,:,j) = (probs <= threshold) .* 255;
 end
 
-%example of empty matrix to place computation output
-
-
-% play the video
-implay(background, f_rate);
-implay(moving, f_rate);
-
-
+implay(moving);
