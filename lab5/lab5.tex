@@ -54,5 +54,104 @@
   upquote=true,
 }
 \maketitle
+\section*{Fixed threshold}
+In this algorithm the moving pixels are determined by computing the
+squared difference between the current and the previous frame and
+applying a threshold:
+\begin{align}
+  \rho_k(x,y) &= I_k(x,y) - I_{k-1}(x,y) \\
+  m_k(x,y) &= \begin{cases}
+    255 \qquad \rho_k^2(x,y) > T_1 \\
+    0 \qquad \text{otherwise}
+    \end{cases} .
+\end{align}
+By visualizing the video consisting of the moving pixels $m_k(x,y)$ it
+can be seen that this simple threshold algorithm is able to detect the
+movement in \inlinecode{chair.avi} without too much noise using a
+value of $T_1 = 100$.
+
+The change of focal length at the beginning of the video is detected
+as a movement of almost every pixel in the image, but the change in
+exposure times do not produce false detections. There are always some
+small regions of pixels that are considered moving due to the noise
+and the refection in the pane glass is detected but is not
+distinguishable from these false movements.  Since this algorithm uses
+only the previous frame it stops to detected the chair as a moving
+object as soon as it becomes still.  Since this algorithm is unable
+to detect movement in uniform regions the pixels that are moving
+correspond to the contours of the moving objects.
+
+An example of the detected motion is shown in Fig.\ref{fig:thresh},
+for comparison the original frame and its predecessor are shown in
+Fig.~\ref{fig:thresh_orig}~and~\ref{fig:thresh_orig_prev}.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{matlab/move_chair_orig_prev}
+    \caption{Previous frame}
+    \label{fig:thresh_orig_prev}
+  \end{subfigure}%
+  \begin{subfigure}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{matlab/move_chair_orig}
+    \caption{Current frame}
+    \label{fig:thresh_orig}
+  \end{subfigure}%
+  \begin{subfigure}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{matlab/move_chair_thresh}
+    \caption{Detected motion}
+    \label{fig:thresh}
+  \end{subfigure}%
+  \caption{Example of the threshold algorithm}
+\end{figure}
+
+\section*{Background modeling}
+To model the background this algorithm keeps a running average of the
+frames, computes the squared difference between the current frame and
+the background and detects a moving pixel when it's above a threshold:
+\begin{align}
+  B_k(x,y) &= \alpha I_{k-1}(x,y) + (1-\alpha)B_{k-1}(x,y) \\
+  \rho_k(x,y) &= I_k(x,y) - B_k(x,y) \\
+  m_k(x,y) &= \begin{cases}
+    255 \qquad \rho_k^2(x,y) > T_2 \\
+    0 \qquad \text{otherwise}
+    \end{cases} .
+\end{align}
+Trying various values for the learning rate $\alpha \in (0,1)$ it can
+be seen that, as it becomes closer to one, the algorithm behaves more
+like the simple threshold algorithm because the background weights
+more the most recent image instead of the saved background. As
+$\alpha$ becomes closer to zero the background incorporates more
+slowly the new frames. This causes the detection of some trails behind
+the moving objects as can be seen in Fig.\ref{fig:back} and also the
+detection of the changes in exposure time as motion. With the
+parameters $\alpha = 0.5$ and $T_2 = 130$ we get reasonable
+performances, fast movements still leave a trail behind them, but the
+change in exposure times are not detected anymore.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{matlab/fast_motion_orig_prev}
+    \caption{Previous frame}
+    \label{fig:back_orig_prev}
+  \end{subfigure}%
+  \begin{subfigure}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{matlab/fast_motion_orig}
+    \caption{Current frame}
+    \label{fig:back_orig}
+  \end{subfigure}%
+  \begin{subfigure}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{matlab/fast_motion_back}
+    \caption{Detected motion}
+    \label{fig:back}
+  \end{subfigure}%
+  \caption{Example of the background modeling algorithm}
+\end{figure}
 
 \end{document}

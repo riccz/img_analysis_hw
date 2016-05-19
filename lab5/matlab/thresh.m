@@ -29,6 +29,10 @@ for i=2:k
     moving(:,:,i) = (diff.^2 > threshold) .* 255;
 end
 
+imwrite(mov(:,:,365), 'move_chair_orig_prev.png');
+imwrite(mov(:,:,366), 'move_chair_orig.png');
+imwrite(moving(:,:,366), 'move_chair_thresh.png');
+
 % play the video
 implay(mov, f_rate);
 implay(moving, f_rate);
