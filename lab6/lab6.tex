@@ -58,7 +58,7 @@
 
 To estimate the motion from one frame to the next some features are
 first extracted using the Harris corner detector (limiting the number
-of returned features to \inlinecode{corner_max_num}), beacuse it would
+of returned features to \inlinecode{corner_max_num}), because it would
 be very time consuming to run the Lucas-Kanade algorithm on every
 pixel in each frame. Then the gradients $I_x$, $I_y$ and $I_t$ are
 computed over the whole frame, the spatial ones are computed using the
@@ -69,7 +69,7 @@ with
   I_t(x,y,t) = \frac{I(x,y,t+1) - I(x,y,t-1)}{2} .
 \end{equation}
 In this and the following steps the color information is ignored and
-the image is converted to grayscale.
+the image is converted to gray-scale.
 
 For each feature point $(x_j, y_j)$ a window of $2W+1$ by $2W+1$
 pixels is taken from the gradients, centered in $(x_j, y_j)$, so the
@@ -115,7 +115,7 @@ magnitude of the eigenvalues and their ratio in three cases:
     \item when $\lambda_1, \lambda_2 \geq
       \inlinecode{corner_eig_thresh}$ but $\lambda_{max} \geq
       \lambda_{min} \cdot \inlinecode{corner_eigratio_thresh}$ the
-      intensity varies a lot olny in one direction so the feature
+      intensity varies a lot only in one direction so the feature
       point is an edge,
     \item in the other cases the eigenvalues are small so the feature
       point is inside a uniform region.
@@ -154,12 +154,12 @@ vectors is shown is Fig.~\ref{fig:car1}~and~\ref{fig:car2}.
 
 In a more complex example, where the camera is moving instead of the
 toy car, it can be seen that it is difficult for this algorithm to
-correclty estimate fast motion. As an example, in
+correctly estimate fast motion. As an example, in
 Fig.~\ref{fig:fast_motion} the camera is moving upward, but a lot of
 the estimated motion vectors do not point downward. In another example
 (Fig.~\ref{fig:slow_motion}) the camera is moving more slowly toward
 the car and it can be seen that the motion vectors are mostly
-correct. Also in this video the maxmimum number of extracted features
+correct. Also in this video the maximum number of extracted features
 was 50.
 \begin{figure}[htbp]
   \centering
@@ -185,11 +185,11 @@ video the corner of the table is one of the better tracked points,
 since there is a very sharp change in intensity.
 
 In a video with more moving elements, like \inlinecode{test_room.mp4},
-the limt on the number of features must be increased to track all the
+the limit on the number of features must be increased to track all the
 moving elements: with just 50 features like in the previous examples
 the hand-waving in the background is completely missed, while using
 200 features the algorithm is able to follow it. Even the movement of
-the person on the chair in the foregraound is not followed so well
+the person on the chair in the foreground is not followed so well
 with just 50 points because of the low contrast with the floor
 (Fig.~\ref{fig:chair}).
 \begin{figure}[htbp]
