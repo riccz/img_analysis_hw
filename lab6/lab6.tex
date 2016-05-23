@@ -1,0 +1,128 @@
+\documentclass[a4paper,oneside]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\usepackage[margin=2.54cm]{geometry}
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{textcomp}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage[section]{placeins}
+\usepackage{hyperref}
+
+\definecolor{matlabgreen}{RGB}{28,172,0}
+\definecolor{matlablilas}{RGB}{170,55,241}
+
+\newcommand{\includecode}[1]{\lstinputlisting[caption={\ttfamily #1.m},label={lst:#1}]{matlab/#1.m}}
+\newcommand{\textinlinecode}[1]{\lstinline[basicstyle=\ttfamily,keywordstyle={},stringstyle={},commentstyle={\itshape}]{#1}}
+\newcommand{\inlinecode}[1]{\ifmmode\text{\textinlinecode{#1}}\else\textinlinecode{#1}\fi}
+
+\renewcommand{\vec}[1]{\overline{#1}}
+\renewcommand{\Re}[1]{\operatorname{Re}\left[#1\right]}
+\newcommand{\E}[1]{\operatorname{E}\left[#1\right]}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\F}[1]{\operatorname{\mathcal{F}}\left[#1\right]}
+\newcommand{\ceil}[1]{\left\lceil#1\right\rceil}
+\newcommand{\floor}[1]{\left\lfloor#1\right\rfloor}
+\newcommand{\Prob}[1]{\operatorname{P}\left[#1\right]}
+\newcommand{\ProbC}[2]{\operatorname{P}\left[#1\middle|#2\right]}
+\newcommand{\ind}[1]{\operatorname{\mathbbm{1}}\left\{#1\right\}}
+\newcommand{\distr}[0]{\sim}
+\newcommand{\unif}[1]{\mathcal{U}_{#1}}
+
+\author{Riccardo Zanol}
+\title{Laboratory 6}
+
+\begin{document}
+\lstset{
+  language=Matlab,
+  basicstyle={\ttfamily \footnotesize},
+  breaklines=true,
+  morekeywords={true,false,warning,xlim,ylim},
+  keywordstyle=\color{blue},
+  stringstyle=\color{matlablilas},
+  commentstyle={\color{matlabgreen} \itshape},
+  numberstyle={\ttfamily \tiny},
+  frame=leftline,
+  showstringspaces=false,
+  numbers=left,
+  upquote=true,
+}
+\maketitle
+
+To estimate the motion from one frame to the next some features are
+first extracted using the Harris corner detector (limiting the number
+of returned features to \inlinecode{corner_max_num}), beacuse it would
+be very time consuming to run the Lucas-Kanade algorithm on every
+pixel in each frame. Then the gradients $I_x$, $I_y$ and $I_t$ are
+computed over the whole frame, the spatial ones are computed using the
+built-in Matlab function \inlinecode{imgradientxy}, which uses the
+Sobel mask by default, while the temporal gradient is approximated
+with
+\begin{equation}
+  I_t(x,y,t) = \frac{I(x,y,t+1) - I(x,y,t-1)}{2} .
+\end{equation}
+
+For each feature point $(x_j, y_j)$ a window of $2W+1$ by $2W+1$
+pixels is taken from the gradients, centered in $(x_j, y_j)$, so the
+optical flow equations for the pixels of the window can be written as
+\begin{align}
+  \begin{bmatrix}
+    I_x(\vec{p_1}) & I_y(\vec{p_1}) \\
+    I_x(\vec{p_2}) & I_y(\vec{p_2}) \\
+    \vdots & \vdots \\
+    I_x(\vec{p_{N_W}}) & I_y(\vec{p_{N_W}}) \\
+  \end{bmatrix}
+  \begin{bmatrix}
+    u \\ v
+  \end{bmatrix}
+  &= - \begin{bmatrix}
+    I_t(\vec{p_1}) \\
+    I_t(\vec{p_2}) \\
+    \vdots \\
+    I_t(\vec{p_{N_W}}) \\
+  \end{bmatrix} \\
+  A \begin{bmatrix} u \\ v \end{bmatrix} &= - b
+\end{align}
+where $(u,v)$ is the velocity of the motion that should be estimated
+and $\vec{p_i} \in \{ (-W + x_j,\dots W + x_j) \times (-W + y_j,\dots
+W + y_j)\}$.  Finally, the motion $(u,v)$ of the window around each
+feature point is obtained from the least squares solution:
+\begin{align}
+  A^TA \begin{bmatrix} u \\ v \end{bmatrix} &= -A^Tb \\
+  \begin{bmatrix} u \\ v \end{bmatrix} &= -\left(A^TA\right)^{-1}A^Tb .
+\end{align}
+The window used in every video has the suggested value for $W=7$.
+
+Since the accuracy of the estimate depends on the eigenvalues of
+$A^TA$, which is also the second moment matrix used in the Harris
+corner detector, the features are classified according to the
+magnitude of the eigenvalues and their ratio in three cases:
+\begin{itemize}
+  \item when $\lambda_1, \lambda_2 \geq
+    \inlinecode{corner_eig_thresh}$ and
+    $\frac{\lambda_{max}}{\lambda_{min}} <
+    \inlinecode{corner_eigratio_thresh}$ the intensity varies a lot in
+    every direction so the feature point is a corner,
+    \item when $\lambda_1, \lambda_2 \geq
+      \inlinecode{corner_eig_thresh}$ but $\lambda_{max} \geq
+      \lambda_{min} \cdot \inlinecode{corner_eigratio_thresh}$ the
+      intensity varies a lot olny in one direction so the feature
+      point is an edge,
+    \item in the other cases the eigenvalues are small so the feature
+      point is inside a uniform region.
+\end{itemize}
+In the output videos, these points and a scaled version of their
+motion are drawn in, respectively, green, blue and red. In every
+tested video the suggested parameters $ \inlinecode{corner_eig_thresh}
+= 10000$ and $ \inlinecode{corner_eigratio_thresh} = 10$ seem to
+produce good results.
+
+
+\end{document}
