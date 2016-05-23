@@ -68,6 +68,8 @@ with
 \begin{equation}
   I_t(x,y,t) = \frac{I(x,y,t+1) - I(x,y,t-1)}{2} .
 \end{equation}
+In this and the following steps the color information is ignored and
+the image is converted to grayscale.
 
 For each feature point $(x_j, y_j)$ a window of $2W+1$ by $2W+1$
 pixels is taken from the gradients, centered in $(x_j, y_j)$, so the
@@ -124,5 +126,77 @@ tested video the suggested parameters $ \inlinecode{corner_eig_thresh}
 = 10000$ and $ \inlinecode{corner_eigratio_thresh} = 10$ seem to
 produce good results.
 
+In the simple examples where one or two toy cars move horizontally
+across the frame (\inlinecode{car1.avi} and \inlinecode{car2.avi})
+this algorithm is able to track the motion using less than 50 feature
+points extracted from the Harris detector. Even when the two cars are
+very close most of the motion vectors point in the same direction,
+except for some points which move as if they were part of the car
+moving in the opposite direction. An example of the detected motion
+vectors is shown is Fig.~\ref{fig:car1}~and~\ref{fig:car2}.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}{0.5\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{car1_example}
+    \caption{\inlinecode{car1.avi}}
+    \label{fig:car1}
+  \end{subfigure}%
+  \begin{subfigure}{0.5\textwidth}
+        \centering
+    \includegraphics[width=0.95\textwidth]{car2_example}
+    \caption{\inlinecode{car2.avi}}
+    \label{fig:car2}
+  \end{subfigure}
+  \caption{Examples from the two videos with the toy cars. The motion
+    vectors are scaled by 100}
+\end{figure}
 
+In a more complex example, where the camera is moving instead of the
+toy car, it can be seen that it is difficult for this algorithm to
+correclty estimate fast motion. As an example, in
+Fig.~\ref{fig:fast_motion} the camera is moving upward, but a lot of
+the estimated motion vectors do not point downward. In another example
+(Fig.~\ref{fig:slow_motion}) the camera is moving more slowly toward
+the car and it can be seen that the motion vectors are mostly
+correct. Also in this video the maxmimum number of extracted features
+was 50.
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}{0.5\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{fast_moving_cam}
+    \caption{Fast motion}
+    \label{fig:fast_motion}
+  \end{subfigure}%
+  \begin{subfigure}{0.5\textwidth}
+        \centering
+    \includegraphics[width=0.95\textwidth]{slow_moving_cam}
+    \caption{Slow motion}
+    \label{fig:slow_motion}
+  \end{subfigure}
+  \caption{Examples from \inlinecode{test_ferrari_moving_cam.mp4}. The
+    motion vectors are scaled by 100}
+\end{figure}
+
+When the camera rotates the algorithm estimates better the motion of
+the points in the background that those of the car and during all the
+video the corner of the table is one of the better tracked points,
+since there is a very sharp change in intensity.
+
+In a video with more moving elements, like \inlinecode{test_room.mp4},
+the limt on the number of features must be increased to track all the
+moving elements: with just 50 features like in the previous examples
+the hand-waving in the background is completely missed, while using
+200 features the algorithm is able to follow it. Even the movement of
+the person on the chair in the foregraound is not followed so well
+with just 50 points because of the low contrast with the floor
+(Fig.~\ref{fig:chair}).
+\begin{figure}[htbp]
+  \centering
+    \includegraphics[width=0.6\textwidth]{chair}
+    \caption{Example from \inlinecode{test_room.mp4} with 200 feature
+      points and the motion vectors scaled by 100}
+    \label{fig:chair}
+  \end{figure}
 \end{document}
