@@ -12,13 +12,14 @@ winsize = 7;
 corner_eig_thresh = 10000;
 corner_eigratio_thresh = 10;
 corner_max_num = 50;
-uv_visualization_scale = 20;
+uv_visualization_scale = 100;
 
 out = zeros(H,W,3,K, 'uint8');
-frame_prev = mov(:,:,:,1);
-for k=2:K
+for k=2:K-1
     frame = mov(:,:,:,k);
-    [motion, feats, f_type] = estimate_motion_lk(frame, frame_prev, winsize, corner_max_num, corner_eig_thresh, corner_eigratio_thresh);
+    frame_prev = mov(:,:,:,k-1);
+    frame_next = mov(:,:,:,k+1);
+    [motion, feats, f_type] = estimate_motion_lk(frame, frame_prev, frame_next, winsize, corner_max_num, corner_eig_thresh, corner_eigratio_thresh);
     
     outframe = frame;
     corners = feats(f_type == FT_CORNER,:);
@@ -49,12 +50,14 @@ for k=2:K
     end
     
     out(:,:,:,k) = outframe;
-    frame_prev = frame;
 end
 
 implay(out);
 
-v = VideoWriter('out.mp4', 'MPEG-4');
-open(v)
-writeVideo(v,out);
-close(v);
+% car1
+imwrite(out(:,:,:,112), 'car1_example.png');
+
+% v = VideoWriter('out.mp4', 'MPEG-4');
+% open(v)
+% writeVideo(v,out);
+% close(v);

@@ -1,4 +1,4 @@
-function [motion, c, c_type] = estimate_motion_lk(frame, frame_prev, winsize, corner_max_num, corner_eig_thresh, corner_eigratio_thresh)
+function [motion, c, c_type] = estimate_motion_lk(frame, frame_prev, frame_next, winsize, corner_max_num, corner_eig_thresh, corner_eigratio_thresh)
 % Feature types
 FT_CORNER = 1;
 FT_EDGE = 2;
@@ -6,12 +6,13 @@ FT_UNIF = 3;
 
 frame = rgb2gray(frame);
 frame_prev = rgb2gray(frame_prev);
+frame_next = rgb2gray(frame_next);
 
 c = corner(frame, 'Harris', corner_max_num);
 c_type = zeros(size(c, 1), 1);
 
 [gradx, grady] = imgradientxy(frame);
-gradt = (double(frame) - double(frame_prev)) ./ 2;
+gradt = (double(frame_next) - double(frame_prev)) ./ 2;
 
 motion = zeros(size(c,1), 2);
 for j=1:size(c, 1)
