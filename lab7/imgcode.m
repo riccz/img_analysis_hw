@@ -1,6 +1,6 @@
 %LAB7 : DCT-based image coding
 
-% Student Name:
+% Student Name: Riccardo Zanol
 
 % Write here any comment for the instructor if needed: 
 % ....
