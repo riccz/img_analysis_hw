@@ -37,8 +37,13 @@ TI = zeros(h,w);
 %DCT (input IS -> output TI)
 % You can use the dct2 function of Matlab
 
-%...write here the code
-
+for i=1:blocks_h
+   for j=1:blocks_w
+       block_coords_i = (i-1)*8 +1: i*8;
+       block_coords_j = (j-1)*8 +1: j*8;
+       TI(block_coords_i, block_coords_j) = dct2(IS(block_coords_i, block_coords_j));
+    end
+end
 
 figure('name','DCT');
 imshow(TI,[0 max(TI(:))]);
@@ -66,11 +71,14 @@ QI = zeros(h,w);
 % to quantize divide each coefficient for the corresponding Q value and
 % round to the nearest integer
 
-
-%...write here the code
-
-
-
+for i=1:blocks_h
+   for j=1:blocks_w
+       block_coords_i = (i-1)*8 +1: i*8;
+       block_coords_j = (j-1)*8 +1: j*8;
+       TI_block = TI(block_coords_i, block_coords_j);
+       QI(block_coords_i, block_coords_j) = round(TI_block ./ Q);
+    end
+end
    
 % Huffman encoding (input QI -> output comp)
 range = max(abs(QI(:)));
@@ -97,19 +105,28 @@ IQ = zeros(h,w);
 % you need to multiply each decoded coefficient (QID) for the corresponding Q value and
 % place the result in IQ
 
-
-%...write here the code
-
-
+for i=1:blocks_h
+   for j=1:blocks_w
+       block_coords_i = (i-1)*8 +1: i*8;
+       block_coords_j = (j-1)*8 +1: j*8;
+       QID_block = QID(block_coords_i, block_coords_j);
+       IQ(block_coords_i, block_coords_j) = round(QID_block .* Q);
+    end
+end
 
 % Place here the output of the inverse transform (input IQ -> output OUT) 
 OUT = zeros(h,w);
 
 %Inverse transform (IDCT) - use idct2
 
-%...write here the code
-
-
+for i=1:blocks_h
+   for j=1:blocks_w
+       block_coords_i = (i-1)*8 +1: i*8;
+       block_coords_j = (j-1)*8 +1: j*8;
+       IQ_block = IQ(block_coords_i, block_coords_j);
+       OUT(block_coords_i, block_coords_j) = idct2(IQ_block);
+    end
+end
 
 OUT = OUT+128; % invert the shift
 
