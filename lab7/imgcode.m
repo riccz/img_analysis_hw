@@ -144,6 +144,6 @@ fprintf('Mean Squared Error %d \n', mse);
 
 %Compile this table 
 % Qscale   compr.ratio    MSE
-%  0.5                 
-%  1                   
-%  2                   
+%  0.5     3.72           4.35   
+%  1       4.86           55.51 
+%  2       5.69           97.99 
