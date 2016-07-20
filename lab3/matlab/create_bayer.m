@@ -14,7 +14,11 @@ function [bayer bayer3] = create_bayer(filename)
 
 %read image
 img = imread(filename);
+assert(isa(img, 'uint8'));
+assert(ndims(img) == 3);
 [h, w, cc] = size(img);
+assert(mod(h, 2) == 0 && mod(w, 2) == 0);
+assert(cc == 3);
 
 %create matrices for the output data
 bayer = zeros(h,w);
@@ -23,21 +27,17 @@ bayer3 = zeros(h,w,3);
 bayer3 = uint8(bayer3);
 
 % extract the data 
-for y= 1:2:h
-    for x= 1:2:w
-        bayer(y,x) =  img(y,x,2);
-        bayer(y+1,x) = img(y+1,x,3);
-        bayer(y,x+1) = img(y,x+1,1);
-        bayer(y+1,x+1) = img(y+1,x+1,2);
-    end
-end
-
-for y= 1:2:h
-    for x= 1:2:w
-        bayer3(y,x,:) = [0 img(y,x,2) 0 ];
-        bayer3(y+1,x,:) = [0 0 img(y+1,x,3) ];
-        bayer3(y,x+1,:) = [ img(y,x+1,1) 0 0 ];
-        bayer3(y+1,x+1,:) = [0 img(y+1,x+1,2) 0 ];
+for y= 0:h/2-1
+    for x= 0:w/2-1
+        bayer(2*y+1,2*x+1) =  img(2*y+1,2*x+1,2);
+        bayer(2*y+2,2*x+1) = img(2*y+2,2*x+1,3);
+        bayer(2*y+1,2*x+2) = img(2*y+1,2*x+2,1);
+        bayer(2*y+2,2*x+2) = img(2*y+2,2*x+2,2);
+        
+        bayer3(2*y+1,2*x+1,2) =  img(2*y+1,2*x+1,2);
+        bayer3(2*y+2,2*x+1,3) = img(2*y+2,2*x+1,3);
+        bayer3(2*y+1,2*x+2,1) = img(2*y+1,2*x+2,1);
+        bayer3(2*y+2,2*x+2,2) = img(2*y+2,2*x+2,2);
     end
 end
 
