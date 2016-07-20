@@ -1,16 +1,19 @@
-all: lab3.zip
+ZIPFILE = lab3.zip
+CODE_FILES = matlab/*.m
 
-lab3.zip: lab3.pdf matlab/*.m
-	zip lab3.zip lab3.pdf matlab/*.m
+all: clean $(ZIPFILE)
 
-%.pdf: %.tex clean
+$(ZIPFILE): $(ZIPFILE:.zip=.pdf) $(CODE_FILES)
+	zip -9 -r $@ $^
+
+%.pdf: %.tex
 	pdflatex $<
 	pdflatex $<
 
 clean:
-	rm *.pdf || true
-	rm *.aux || true
-	rm *.out || true
-	rm lab3.zip || true
+	rm *.pdf 2>/dev/null || true
+	rm *.aux 2>/dev/null || true
+	rm *.out 2>/dev/null || true
+	rm $(ZIPFILE) 2>/dev/null || true
 
-.PHONY: clean
+.PHONY: clean all

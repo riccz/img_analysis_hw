@@ -2,7 +2,7 @@
 *.pdf
 *.out
 *.log
-lab3.zip
+lab*.zip
 matlab/*.eps
 matlab/*.png
 matlab/*.tiff
