@@ -28,12 +28,6 @@ for i=1:length(test_imgs)
     demosaic_lab = applycform(demosaic_imgs{i}, C);
     matlab_demosaic_lab = applycform(matlab_demosaic_imgs{i}, C);
     
-    % Exclude a 2 pixel border from the comparison
-    [H, W, ~] = size(test_img);
-    test_img_lab = test_img_lab(3:H-2,3:W-2,:);
-    demosaic_lab = demosaic_lab(3:H-2,3:W-2,:);
-    matlab_demosaic_lab = matlab_demosaic_lab(3:H-2,3:W-2,:);
-    
     mean_dists(i) = mean(mean(sqrt(sum((demosaic_lab - test_img_lab).^2, 3))));
     matlab_mean_dists(i) = mean(mean(sqrt(sum((matlab_demosaic_lab - test_img_lab).^2, 3))));
 end
