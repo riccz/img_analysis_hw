@@ -1,44 +1,27 @@
-\documentclass{article}
+\documentclass[a4paper,oneside]{article}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 
+\usepackage[margin=2.54cm]{geometry}
+
 \usepackage{amsmath}
 \usepackage{siunitx}
 \usepackage{hyperref}
-\usepackage{listings}
 \usepackage{color}
-\usepackage{textcomp}
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage[section]{placeins}
 
-\definecolor{matlabgreen}{RGB}{28,172,0}
-\definecolor{matlablilas}{RGB}{170,55,241}
-
-\newcommand{\includecode}[1]{\lstinputlisting[caption={\ttfamily #1.m},label={lst:#1}]{matlab/#1.m}}
-
-\newcommand{\inlinecode}[1]{\lstinline[basicstyle=\ttfamily,keywordstyle={}]{#1}}
+\usepackage{customcmds}
+\usepackage{codecmds}
 
 \author{Riccardo Zanol}
 \title{Laboratory 3}
 
 \begin{document}
-\lstset{
-  language=Matlab,
-  basicstyle={\ttfamily \footnotesize},
-  breaklines=true,
-  morekeywords={true,false,warning,xlim,ylim},
-  keywordstyle=\color{blue},
-  stringstyle=\color{matlablilas},
-  commentstyle={\color{matlabgreen} \itshape},
-  numberstyle={\ttfamily \tiny},
-  frame=leftline,
-  showstringspaces=false,
-  numbers=left,
-  upquote=true,
-}
+\matlabcodeconfig
 \maketitle
 \section*{Experiment 1}
 In the matlab script \inlinecode{ex1.m} each one of the provided
