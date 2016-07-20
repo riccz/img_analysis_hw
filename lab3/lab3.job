@@ -1,0 +1,6 @@
+#!/bin/bash
+#$ -cwd -m ea -q parallel -l par_cpu=8
+
+pushd matlab
+matlab -nodesktop -nosplash -r ex1,ex2
+popd
