@@ -5,7 +5,7 @@ test_imgs = {'kodim01.png' 'kodim05.png' 'kodim13.png' 'kodim19.png'};
 % Perform the demosaicing
 demosaic_imgs = cell(1, length(test_imgs));
 matlab_demosaic_imgs = cell(1, length(test_imgs));
-for i=1:length(test_imgs)
+parfor i=1:length(test_imgs)
     fname = ['../images/' test_imgs{i}];
     [bayer, bayer3] = create_bayer(fname);
     
