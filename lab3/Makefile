@@ -8,6 +8,8 @@ $(ZIPFILE): $(ZIPFILE:.zip=.pdf) $(CODE_FILES)
 
 %.pdf: %.tex
 	pdflatex $<
+	bibtex $(<:.tex=.aux)
+	pdflatex $<
 	pdflatex $<
 
 clean:
