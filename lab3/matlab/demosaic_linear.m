@@ -111,5 +111,5 @@ for i=1:H
     end
 end
 
-img = img ./ 255; % Return an image with pixels in [0,1]
+img = uint8(img);
 end

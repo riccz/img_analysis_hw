@@ -69,7 +69,7 @@ for x=0:W-1
         img_green(y+1,x+1) = clip(neighs, 2*median_g - mean(X));
     end
 end
-img_green = img_green ./ 255;
+img_green = uint8(img_green);
 end
 
 function G = clip(neighs, x)
