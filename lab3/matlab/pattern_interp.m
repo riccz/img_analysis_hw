@@ -13,16 +13,47 @@ for x=0:W-1
             continue;
         end
         
-        if x < 2 || y < 2 || x > W-3 || y > H-3
-            warning('Implement on the borders');
+        % Left border -> use the mean of the neighbors
+        if x == 0
+            if y == H-1
+                img_green(y+1, x+1) = mean([bayer_green(y+1, x+2), bayer_green(y,x+1)]);
+            else
+                img_green(y+1, x+1) = mean([bayer_green(y+2, x+1), bayer_green(y, x+1), bayer_green(y+1, x+2)]);
+            end
             continue;
         end
         
+        % Right border -> use the mean of the neighbors
+        if x == W-1
+            if y == 0
+                img_green(y+1, x+1) = mean([bayer_green(y+2, x+1), bayer_green(y+1,x)]);
+            elseif y == H-1
+                img_green(y+1, x+1) = mean([bayer_green(y, x+1), bayer_green(y+1, x)]);
+            else
+                img_green(y+1, x+1) = mean([bayer_green(y+2, x+1), bayer_green(y, x+1), bayer_green(y+1, x)]);
+            end
+            continue;
+        end
+        
+        % Top border -> use the mean of the neighbors
+        if y == 0
+            img_green(y+1, x+1) = mean([bayer_green(y+2, x+1), bayer_green(y+1, x), bayer_green(y+1, x+2)]);
+            continue;
+        end
+        
+        % Bottom border -> use the mean of the neighbors
+        if y == H-1
+            img_green(y+1, x+1) = mean([bayer_green(y, x+1), bayer_green(y+1, x), bayer_green(y+1, x+2)]);
+            continue;
+        end
+        
+        % All 4 neighbors are available -> pattern matching
         neighs = [ bayer_green(y,x+1), ...
             bayer_green(y+1,x+2), ...
             bayer_green(y+2,x+1), ...
             bayer_green(y+1,x) ...
             ];
+        
         mean_g = mean(neighs);
         median_g = median(neighs);
         is_geq = neighs >= mean_g;
@@ -63,8 +94,12 @@ for x=0:W-1
         
         X = zeros(length(X_pos_relative),1);
         for i=1:length(X)
-            X(i) = bayer_green(y+X_pos_relative(i,1)+1, ...
-                x+X_pos_relative(i,2)+1);
+            y_ = y+X_pos_relative(i,1);
+            x_ = x+X_pos_relative(i,2);
+            if y_ < 0 || y_ > H-1 || x_ < 0 || x_ > W-1
+                continue;
+            end
+            X(i) = bayer_green(y_ + 1, x_ + 1);
         end
         img_green(y+1,x+1) = clip(neighs, 2*median_g - mean(X));
     end
