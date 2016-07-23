@@ -7,6 +7,7 @@
 \usepackage[margin=2.54cm]{geometry}
 
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{siunitx}
 \usepackage{hyperref}
 \usepackage{color}
@@ -27,22 +28,116 @@
 \matlabcodeconfig
 \maketitle
 \section*{Experiment 1}
-In the matlab script \inlinecode{ex1.m} each one of the provided
-\inlinecode{kodim_*.png} images is mosaiced by
-\inlinecode{create_bayer}, that produces an image where the intensity
-of each pixel represents only one color component according to the
-Bayer pattern ``GRBG'', then the function \inlinecode{demosaic_linear}
-is used to linearly interpolate the value of the closest two or four
-pixels, depending on the location, to determine the value of each
-unknown color component. This function ignores a border of two pixels
-around the image and sets it to $(0,0,0)$ to avoid having to handle
-this special case in the code.  The script also performs the
-demosaicing using the built-in matlab function \inlinecode{demosaic}
-which uses a different algorithm, the gradient-corrected bilinear
-interpolation, that exploits the correlation between the color
-components and corrects the linearly interpolated value of a pixel
-with the gradient (of a different color) in that pixel.
+\stepcounter{section}
+The purpose of first part of this homework is to implement two
+demosaicing algorithms and test them, together with the one
+implemented in Matlab, on the eight images \inlinecode{kodim_XX.png}
+to compare their performances, visually and using the mean squared
+error in the CIELAB color space.
 
+Each one of the test images is subsampled by the provided function
+\inlinecode{create_bayer} according to the GRBG Bayer mask (see
+Fig.~\ref{fig:bayer_grbg}), in order to simulate the kind of data that
+would be acquired by a single-sensor imaging system,
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}{0.5\textwidth}
+    \centering
+    \includegraphics[width=0.66\textwidth]{include_imgs/bayer_grbg}
+    \caption{GRBG}
+    \label{fig:bayer_grbg}
+  \end{subfigure}%
+  \begin{subfigure}{0.5\textwidth}
+    \centering
+    \includegraphics[width=0.66\textwidth]{include_imgs/bayer_rggb}
+    \caption{RGGB}
+    \label{fig:bayer_rggb}
+  \end{subfigure}
+  \caption{The two Bayer CFA patterns used in this homework}
+\end{figure}
+and is then demosaiced using three of the algorithms described in
+\cite{demosaic_alg}: the linear interpolation, the gradient-corrected
+linear interpolation and a combianation of the pattern recognition
+interpolation and the smooth hue transition interpolation.
+
+\subsection{Linear interpolation}
+The linear interpolation algorithm is the simplest of the three, it
+just sets the missing color components of each pixel to their means in
+a 3~by~3 window around the pixel.
+%
+As an example, in Fig.~\ref{fig:bayer_neigh}, the color of the central
+pixel is set to
+\begin{align*}
+  R_5 &= R_5 \\
+  G_5 &= \frac{1}{4}\left( G_2 + G_4 + G_6 + G_8 \right) \\
+  B_5 &= \frac{1}{4}\left( B_1 + B_3 + B_7 + B_9 \right) .
+\end{align*}
+When the algorithm computes the means of the red and blue components
+around a green pixel, e.g.~$R_6$~and~$B_6$ in
+Fig.~\ref{fig:bayer_neigh}, it takes into account only the two pixels
+of the correspondng color that are present in the 3~by~3 window so
+\begin{equation*}
+  B_6 = \frac{1}{2} \left( B_3 + B_9 \right)
+\end{equation*}
+and $R_6$ is the mean between $R_5$ and the value at the right of
+pixel~6.
+%
+The same thing also occurs near the picture borders, where there are
+only three or two pixels to interpolate the green values and just two
+or one pixel to interpolate the other colors.
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.20\textwidth]{include_imgs/bayer_neigh}
+  \caption{Neighborhood of a red pixel in a Bayer pattern}
+  \label{fig:bayer_neigh}
+\end{figure}
+
+This algorithm is implemented by the function
+\inlinecode{demosaic_linear}.
+
+\subsection{Gradient-corrected linear interpolation}
+The gradient-corrected linear interpolation is a more complex
+algorithm, described in detail in \cite{demosaic_gradient}, that
+exploits the correlation between the color components to improve the
+quality of the demosaiced image.
+%
+The mean values of the neighbors, $\hat{r}_{lin}$, $\hat{g}_{lin}$ and
+$\hat{b}_{lin}$ computed like in the previous algorithm, are corrected
+using the gradient of the color that was measured at that location:
+\begin{align*}
+  \hat{g}(i,j) &= \hat{g}_{lin}(i,j) + \alpha \Delta_R(i,j) & & \text{red pixel location} \\
+  \hat{g}(i,j) &= \hat{g}_{lin}(i,j) + \alpha \Delta_B(i,j) & & \text{blue pixel location} \\
+  %
+  \hat{r}(i,j) &= \hat{r}_{lin}(i,j) + \beta \Delta_G(i,j) & & \text{green pixel location} \\
+  \hat{r}(i,j) &= \hat{r}_{lin}(i,j) + \beta \Delta_B(i,j) & & \text{blue pixel location} \\
+  %
+  \hat{b}(i,j) &= \hat{b}_{lin}(i,j) + \gamma \Delta_G(i,j) & & \text{green pixel location} \\
+  \hat{b}(i,j) &= \hat{b}_{lin}(i,j) + \gamma \Delta_R(i,j) & & \text{red pixel location} \\
+\end{align*}
+where the gradients are computed on a 5~by~5 window around the pixel
+at position $(i,j)$ using a mask that depends on the location and on
+the color component that is being interpolated. As an example, when
+the green value is interpolated at the location of a red pixel, the
+gradient is computed as:
+\begin{equation*}
+  \Delta_R(i,j) \triangleq r(i,j) - \frac{1}{4} \sum_{(m,n)} r(i+m,j+n)
+  \qquad (m,n) \in \{(0,-2), (0,2), (-2,0), (2,0)\} .
+\end{equation*}
+The gradient-correction gains are chosen in order to minimize the mean
+squared error given the statistics of an image set (which contains the
+test images used in this homework) and they are approximated to
+multiples of small powers of $1/2$: $\alpha = 1/2$, $\beta = 5/8$ and
+$\gamma = 3/4$. In \cite{demosaic_gradient} the eight possible masks
+for the computation of the gradient are scaled by the
+gradient-correction gains and substituded in the six equations above
+to obtain eight linear FIR filters to apply to the image.
+
+This algorithm is the one implemented by the built-in Matlab function
+\inlinecode{demosaic}.
+
+\subsection{Pattern recognition and smooth hue transition interpolation}
+
+\subsection*{Comparison}
 After having being demosaiced by each one of the two algorithms the
 images are converted into the CIELAB color space to allow them to be
 compared to the original images and the mean squared error of the two
