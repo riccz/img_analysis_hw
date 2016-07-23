@@ -8,7 +8,7 @@ $(ZIPFILE): $(ZIPFILE:.zip=.pdf) $(CODE_FILES)
 
 %.pdf: %.tex
 	pdflatex $<
-	bibtex $(<:.tex=.aux)
+	biber $(<:.tex=)
 	pdflatex $<
 	pdflatex $<
 
@@ -16,6 +16,10 @@ clean:
 	rm *.pdf 2>/dev/null || true
 	rm *.aux 2>/dev/null || true
 	rm *.out 2>/dev/null || true
+	rm *.bcf 2>/dev/null || true
+	rm *.blg 2>/dev/null || true
+	rm *.bbl 2>/dev/null || true
+	rm *.run.xml 2>/dev/null || true
 	rm $(ZIPFILE) 2>/dev/null || true
 
 .PHONY: clean all

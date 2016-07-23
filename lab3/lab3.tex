@@ -13,9 +13,12 @@
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage[section]{placeins}
+\usepackage[backend=biber,style=ieee]{biblatex}
 
 \usepackage{customcmds}
 \usepackage{codecmds}
+
+\addbibresource{lab3.bib}
 
 \author{Riccardo Zanol}
 \title{Laboratory 3}
@@ -173,6 +176,5 @@ processed images.
 \label{fig:dark_artifacts}
 \end{figure}
 
-\bibliographystyle{plain}
-\bibliography{lab3}
+\printbibliography
 \end{document}
