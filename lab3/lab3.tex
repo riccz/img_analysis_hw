@@ -21,6 +21,8 @@
 
 \addbibresource{lab3.bib}
 
+\DeclareMathOperator{\clip}{clip}
+
 \author{Riccardo Zanol}
 \title{Laboratory 3}
 
@@ -31,11 +33,11 @@
 \stepcounter{section}
 The purpose of first part of this homework is to implement two
 demosaicing algorithms and test them, together with the one
-implemented in Matlab, on the eight images \inlinecode{kodim_XX.png}
+implemented in Matlab, on the eight images \inlinecode{kodimXX.png}
 to compare their performances, visually and using the mean squared
 error in the CIELAB color space.
 
-Each one of the test images is subsampled by the provided function
+Each one of the test images is downsampled by the provided function
 \inlinecode{create_bayer} according to the GRBG Bayer mask (see
 Fig.~\ref{fig:bayer_grbg}), in order to simulate the kind of data that
 would be acquired by a single-sensor imaging system,
@@ -57,10 +59,11 @@ would be acquired by a single-sensor imaging system,
 \end{figure}
 and is then demosaiced using three of the algorithms described in
 \cite{demosaic_alg}: the linear interpolation, the gradient-corrected
-linear interpolation and a combianation of the pattern recognition
+linear interpolation and a combination of the pattern recognition
 interpolation and the smooth hue transition interpolation.
 
 \subsection{Linear interpolation}
+\label{sec:linear}
 The linear interpolation algorithm is the simplest of the three, it
 just sets the missing color components of each pixel to their means in
 a 3~by~3 window around the pixel.
@@ -75,7 +78,7 @@ pixel is set to
 When the algorithm computes the means of the red and blue components
 around a green pixel, e.g.~$R_6$~and~$B_6$ in
 Fig.~\ref{fig:bayer_neigh}, it takes into account only the two pixels
-of the correspondng color that are present in the 3~by~3 window so
+of the corresponding color that are present in the 3~by~3 window so
 \begin{equation*}
   B_6 = \frac{1}{2} \left( B_3 + B_9 \right)
 \end{equation*}
@@ -93,7 +96,8 @@ or one pixel to interpolate the other colors.
 \end{figure}
 
 This algorithm is implemented by the function
-\inlinecode{demosaic_linear}.
+\inlinecode{demosaic_linear} and the output images are saved as
+\inlinecode{demosaic_kodimXX.png}.
 
 \subsection{Gradient-corrected linear interpolation}
 The gradient-corrected linear interpolation is a more complex
@@ -129,15 +133,134 @@ test images used in this homework) and they are approximated to
 multiples of small powers of $1/2$: $\alpha = 1/2$, $\beta = 5/8$ and
 $\gamma = 3/4$. In \cite{demosaic_gradient} the eight possible masks
 for the computation of the gradient are scaled by the
-gradient-correction gains and substituded in the six equations above
+gradient-correction gains and substituted in the six equations above
 to obtain eight linear FIR filters to apply to the image.
 
 This algorithm is the one implemented by the built-in Matlab function
-\inlinecode{demosaic}.
+\inlinecode{demosaic} and the output images are saved as
+\inlinecode{matlab_demosaic_kodimXX.png}.
 
 \subsection{Pattern recognition and smooth hue transition interpolation}
+Another demosaicing algorithm described briefly in \cite{demosaic_alg}
+and in more detail in \cite{demosaic_army} is the pattern recognition
+interpolation, which classifies the pixels into edges, corners and
+stripes according to their neighborhood and applies different
+interpolation rules for each kind of point.
+%
+It considers the four neighbors of each missing green pixel and
+computes their mean, then labels each neighbor as either ``low'', when
+its value is smaller than the mean, or ``high'' otherwise.
+%
+These labels are used to classify the missing pixel in one of the
+categories mentioned above:
+\begin{itemize}
+\item if three neighbors share the same label the pixel is part of an
+  edge (see Fig.s \ref{fig:lowedge} and \ref{fig:highedge}),
+\item if two adjacent neighbors share the same label the pixel is part
+  of a corner (see Fig. \ref{fig:corner}),
+\item
+  if two opposite neighbors share the same label the pixel is part of
+  a stripe (see Fig. \ref{fig:stripe}).
+\item The only missing case, four neighbors with the same intensity, is
+  handled like an edge by the code because, as will be seen in the
+  next paragraph, this will give the interpolated pixel the median
+  value of its neighbors (and so their same value).
+\end{itemize}
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}{0.2\textwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth]{include_imgs/pri_corner}
+    \caption{Corner}
+    \label{fig:corner}
+  \end{subfigure}%
+  \begin{subfigure}{0.2\textwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth]{include_imgs/pri_lowedge}
+    \caption{Low edge}
+    \label{fig:lowedge}
+  \end{subfigure}%
+  \begin{subfigure}{0.2\textwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth]{include_imgs/pri_highedge}
+    \caption{High edge}
+    \label{fig:highedge}
+  \end{subfigure}%
+  \begin{subfigure}{0.2\textwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth]{include_imgs/pri_stripe}
+    \caption{Stripe}
+    \label{fig:stripe}
+  \end{subfigure}
+  \caption{Example of classification done by the pattern recognition
+    interpolation algorithm}
+\end{figure}
 
-\subsection*{Comparison}
+After the pixels have been classified, the pattern recognition
+algorithm sets their value according to their class:
+\begin{itemize}
+\item Edge points of both kinds are given the median value of their
+  neighbors,
+  \item Corner points are given the value $G = \clip_C^B(2M-S)$ where
+    $S$ is the mean value of the pixels labeled ``X'' in
+    Fig. \ref{fig:mask_corner},
+    \item Stripe points are given the value $G = \clip_C^B(2M-S)$ where
+    $S$ is the mean value of the pixels labeled ``X'' in
+    Fig. \ref{fig:mask_stripe}.
+\end{itemize}
+In both the stripe and the corner cases above $M$ is the median of the
+four closest neighbors, $B$ and $C$ are the values of the second and
+the third neighbors taken in descending order ($A \geq B \geq C \geq
+D$) and the $\clip$ function is defined as:
+\begin{equation*}
+  \clip_C^B(x) = \begin{cases}
+    B \qquad & x > B \\
+    x \qquad & C \leq x \leq B \\
+    C \qquad & x < C
+    \end{cases} .
+\end{equation*}
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}{0.33\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{include_imgs/pri_corner_mask}
+    \caption{Corner}
+    \label{fig:mask_corner}
+  \end{subfigure}%
+  \begin{subfigure}{0.33\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{include_imgs/pri_stripe_mask}
+    \caption{Stripe}
+    \label{fig:mask_stripe}
+  \end{subfigure}
+  \caption{Masks used in the computation of the interpolated value}
+\end{figure}
+
+There is no mention on \cite{demosaic_alg, demosaic_army} on what the
+algorithm should do near the picture border, when there are not enough
+neighbors, however this is just a small two-pixel border so it should
+not affect the performances so much.
+%
+If the four closest neighbors are not available the pixel cannot be
+classified so the code uses the same linear interpolation algorithm of
+section \ref{sec:linear}.
+%
+When, instead, the pixel can be classified but the ``X'' pixels of
+Fig.s \ref{fig:mask_corner} and \ref{fig:mask_stripe} are not all
+available, the mean $S$ is computed using only the ones that fall
+inside the picture.
+
+This algorithm is designed to work only on the green component so, in
+order to perform a complete demosaicing of an image, another algorithm
+must be used to demosaic the other colors. A suggestion given by
+\cite{demosaic_alg, demosaic_army} is to use the smooth hue transition
+interpolation algorithm, which assumes that the hue changes smoothly
+across an object's surface and so it uses the ratio between the blue
+or red components and the green component instead of their absolute
+values.
+
+
+\subsection{Comparison}
 After having being demosaiced by each one of the two algorithms the
 images are converted into the CIELAB color space to allow them to be
 compared to the original images and the mean squared error of the two
@@ -157,13 +280,16 @@ correction should improve a lot the quality of the interpolation,
 since it halves the MSE.
 \begin{table}[h]
   \centering
-  \begin{tabular}{ccc}
-    Image & Linear interpolation & Gradient corrected interpolation \\
+  \begin{tabular}{IRRR}
+    \multicolumn{1}{c}{Image} &
+    \multicolumn{1}{c}{Linear} &
+    \multicolumn{1}{c}{Gradient-corrected} &
+    \multicolumn{1}{c}{PRI and SHTI} \\
     \hline
-    kodim\_01.png & 7.060 & 4.125 \\
-    kodim\_05.png & 6.228 & 3.386 \\
-    kodim\_13.png & 9.032 & 5.388 \\
-    kodim\_19.png & 4.702 & 2.866
+    kodim01.png & 5.053 & 2.909 & 3.434 \\
+    kodim05.png & 4.637 & 2.407 & 3.242 \\
+    kodim13.png & 6.275 & 3.707 & 4.850 \\
+    kodim19.png & 3.333 & 1.974 & 2.236 \\
   \end{tabular}
   \caption{Mean squared error of the demosaicing algorithms}
   \label{tab:mse}
