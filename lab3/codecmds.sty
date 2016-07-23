@@ -3,6 +3,7 @@
 \usepackage{listings}
 \usepackage{color}
 \usepackage{textcomp}
+\usepackage{collcell}
 
 \definecolor{matlabgreen}{RGB}{28,172,0}
 \definecolor{matlablilas}{RGB}{170,55,241}
@@ -28,3 +29,5 @@
 \newcommand{\inlinecode}[1]{\ifmmode\text{\textinlinecode{#1}}\else\textinlinecode{#1}\fi}
 
 \newcommand{\includecode}[1]{\lstinputlisting[caption={\ttfamily #1.m},label={lst:#1}]{matlab/#1.m}}
+
+\newcolumntype{I}{>{\collectcell\inlinecode}{l}<{\endcollectcell}}
