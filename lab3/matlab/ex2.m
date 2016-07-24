@@ -30,7 +30,12 @@ parfor i=1:length(dng_imgs)
     final_img = post_process(demosaic_img, xyz2cam);
     matlab_final_img = post_process(matlab_demosaic_img, xyz2cam);
     prsh_final_img = post_process(prsh_demosaic_img, xyz2cam);
-    
+
+    % Convert to 8bit
+    final_img = uint8(double(final_img) .* (255/(2^16-1)));
+    matlab_final_img = uint8(double(matlab_final_img) .* (255/(2^16-1)));
+    prsh_final_img = uint8(double(prsh_final_img) .* (255/(2^16-1)));
+
     imwrite(final_img, ['demosaic_' strrep(dng_imgs{i}, '.dng', '.jpg')], ...
         'BitDepth', 8, 'Mode', 'lossy', 'Quality', 90);
     imwrite(matlab_final_img, ['matlab_demosaic_' strrep(dng_imgs{i}, '.dng', '.jpg')], ...
