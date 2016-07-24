@@ -1,12 +1,18 @@
 ZIPFILE = lab3.zip
-CODE_FILES = matlab/*.m
+CODE_FILES = matlab/*.m images/kodim*.png
+EXTRA_IMGS = matlab/*demosaic_kodim*.png
 
 all: clean $(ZIPFILE)
 
+tmp := $(shell mktemp -d)
+pwd := $(shell pwd)
 $(ZIPFILE): $(ZIPFILE:.zip=.pdf) $(CODE_FILES)
 	zip -9 -r $@ $^
+	mkdir "${tmp}/images"
+	cp $(EXTRA_IMGS) "${tmp}/images/"
+	cd "${tmp}" && zip -9 -r "${pwd}/${ZIPFILE}" images/
 
-%.pdf: %.tex
+%.pdf: %.tex %.bib
 	pdflatex $<
 	biber $(<:.tex=)
 	pdflatex $<
