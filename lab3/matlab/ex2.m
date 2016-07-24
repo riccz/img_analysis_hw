@@ -4,27 +4,35 @@ dng_imgs = {'DEI_park.dng', 'macbeth_color.dng', ...
     'macbeth_gray.dng', 'map.dng', 'poster.dng', ...
     'students1.dng', 'students2.dng', 'students3.dng'};
 
+sh_beta = 2^15;
+
 parfor i=1:length(dng_imgs)
     fname = ['../images/' dng_imgs{i}];
-    bayer = read_dng(fname);
+    [bayer, bayer3, croparea, xyz2cam] = read_dng(fname);
     
-    % Convert rggb -> grbg (+1 column at the beginning and end)
+    % Convert rggb -> grbg (-1 column at the beginning)
     [W, H, ~] = size(bayer);
-    bayer = [zeros(W, 1), bayer, zeros(W, 1)];
+    bayer = bayer(:, 2:end);
+    bayer3 = bayer3(:, 2:end, :);
+    croparea([2,4]) = croparea([2,4]) - 1;
     
-    bayer = uint8(bayer .* 255); % Convert to uint8 to use the same code
+    % Demosaic
+    matlab_demosaic_img = demosaic(bayer, 'grbg');
     demosaic_img = demosaic_linear(bayer);
-    matlab_demosaic_img = double(demosaic(bayer, 'grbg')) ./ 255;
+    prsh_demosaic_img = demosaic_pattern_hue(bayer3, sh_beta);
     
-    % Remove the extra columns
-    demosaic_img = demosaic_img(:, 2:H+1, :);
-    matlab_demosaic_img = matlab_demosaic_img(:, 2:H+1, :);
+    % Crop the images
+    demosaic_img = demosaic_img(croparea(1):croparea(3), croparea(2):croparea(4), :);
+    matlab_demosaic_img = matlab_demosaic_img(croparea(1):croparea(3), croparea(2):croparea(4), :);
+    prsh_demosaic_img = prsh_demosaic_img(croparea(1):croparea(3), croparea(2):croparea(4), :);
     
     % Postprocessing
-    final_img = post_process(demosaic_img);
-    matlab_final_img = post_process(matlab_demosaic_img);
+    final_img = post_process(demosaic_img, xyz2cam);
+    matlab_final_img = post_process(matlab_demosaic_img, xyz2cam);
+    prsh_final_img = post_process(prsh_demosaic_img, xyz2cam);
     
-    imwrite(final_img, ['demosaic_' dng_imgs{i} '.tiff']);
-    imwrite(matlab_final_img, ['matlab_demosaic_' dng_imgs{i} '.tiff']);
+    imwrite(final_img, ['demosaic_' strrep(dng_imgs{i}, '.dng', '.png')]);
+    imwrite(matlab_final_img, ['matlab_demosaic_' strrep(dng_imgs{i}, '.dng', '.png')]);
+    imwrite(prsh_final_img, ['prsh_demosaic_' strrep(dng_imgs{i}, '.dng', '.png')]);
     fprintf([dng_imgs{i} ' OK\n']);
 end
