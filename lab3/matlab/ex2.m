@@ -31,8 +31,11 @@ parfor i=1:length(dng_imgs)
     matlab_final_img = post_process(matlab_demosaic_img, xyz2cam);
     prsh_final_img = post_process(prsh_demosaic_img, xyz2cam);
     
-    imwrite(final_img, ['demosaic_' strrep(dng_imgs{i}, '.dng', '.png')]);
-    imwrite(matlab_final_img, ['matlab_demosaic_' strrep(dng_imgs{i}, '.dng', '.png')]);
-    imwrite(prsh_final_img, ['prsh_demosaic_' strrep(dng_imgs{i}, '.dng', '.png')]);
+    imwrite(final_img, ['demosaic_' strrep(dng_imgs{i}, '.dng', '.jpg')], ...
+        'BitDepth', 8, 'Mode', 'lossy', 'Quality', 90);
+    imwrite(matlab_final_img, ['matlab_demosaic_' strrep(dng_imgs{i}, '.dng', '.jpg')], ...
+        'BitDepth', 8, 'Mode', 'lossy', 'Quality', 90);
+    imwrite(prsh_final_img, ['prsh_demosaic_' strrep(dng_imgs{i}, '.dng', '.jpg')], ...
+        'BitDepth', 8, 'Mode', 'lossy', 'Quality', 90);
     fprintf([dng_imgs{i} ' OK\n']);
 end
