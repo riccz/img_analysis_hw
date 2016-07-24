@@ -252,13 +252,48 @@ inside the picture.
 
 This algorithm is designed to work only on the green component so, in
 order to perform a complete demosaicing of an image, another algorithm
-must be used to demosaic the other colors. A suggestion given by
+must be used to interpolate the other colors. A suggestion given by
 \cite{demosaic_alg, demosaic_army} is to use the smooth hue transition
 interpolation algorithm, which assumes that the hue changes smoothly
 across an object's surface and so it uses the ratio between the blue
 or red components and the green component instead of their absolute
 values.
+%
+The red-green and blue-green ratios are linearly interpolated, with
+the same rules of section \ref{sec:linear}. As an example, the blue
+component is interpolated in Fig.~\ref{fig:bayer_neigh} using
+\begin{align*}
+  B_2 &= G_2 \frac{1}{2} \left( \frac{B_1}{G_1} + \frac{B_3}{G_3} \right) \\
+  B_4 &= G_4 \frac{1}{2} \left( \frac{B_1}{G_1} + \frac{B_7}{G_7} \right) \\
+  B_5 &= G_5 \frac{1}{4} \left( \frac{B_1}{G_1} + \frac{B_3}{G_3} +
+  \frac{B_7}{G_7} +\frac{B_9}{G_9}\right) .
+\end{align*}
+This method fails if some green values are zero, but the
+transformation
+\begin{equation*}
+  \frac{B}{G} \rightarrow \frac{B + \beta}{ G + \beta} \qquad \beta > 0
+\end{equation*}
+can be used to avoid this issue.
+%
+With this transformation the previous equations become
+\begin{align*}
+  B_2 &= -\beta + \left(G_2 +\beta \right) \frac{1}{2} \left(
+  \frac{B_1 + \beta}{G_1 + \beta} + \frac{B_3 + \beta}{G_3 + \beta} \right) \\
+  B_4 &= -\beta + \left( G_4 + \beta \right) \frac{1}{2} \left(
+  \frac{B_1 + \beta}{G_1 + \beta} + \frac{B_7 + \beta}{G_7 + \beta} \right) \\
+  B_5 &= -\beta + \left( G_5 +\beta \right) \frac{1}{4} \left(
+  \frac{B_1 + \beta}{G_1 + \beta} + \frac{B_3 + \beta}{G_3 + \beta} +
+  \frac{B_7 + \beta}{G_7 + \beta} +\frac{B_9 + \beta}{G_9 + \beta}\right) .
+\end{align*}
+The value of $\beta$ that is suggested by \cite{demosaic_army} is
+$\beta = 128$.
 
+The pattern recognition interpolation and the smooth hue transition
+interpolation algorithms are implemented, respectively, in the
+functions \inlinecode{pattern_interp} and \inlinecode{smooth_hue} and
+used together by the function \inlinecode{demosaic_pattern_hue} to
+perform the demosaicing. The output images are saved as
+\inlinecode{prsh_demosaic_kodimXX.png}.
 
 \subsection{Comparison}
 After having being demosaiced by each one of the two algorithms the
