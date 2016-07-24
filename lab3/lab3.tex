@@ -296,23 +296,29 @@ perform the demosaicing. The output images are saved as
 \inlinecode{prsh_demosaic_kodimXX.png}.
 
 \subsection{Comparison}
-After having being demosaiced by each one of the two algorithms the
-images are converted into the CIELAB color space to allow them to be
-compared to the original images and the mean squared error of the two
-algorithms is calculated. The MSE is computed by taking the distance
-between each pixel and averaging:
+After the imgaes have been demosaiced by each one of the three
+algorithms, they are converted from the sRGB to the CIELAB color space
+and the MSE between the output and the original images is
+computed. The MSE between $A$ and $B$ is computed by taking the
+euclidean distance between the colors of each corresponding pixel and
+averaging over the image:
 \begin{align*}
   d(i,j) &= \sqrt{\sum_{k=1}^3 \left(A(i,j,k) - B(i,j,k)\right)^2 } \\
   \text{MSE} &= \frac{1}{WH}\sum_{i=0}^H\sum_{j=0}^Wd(i,j)
 \end{align*}
-where $A(i,j,1) = L(i,j)$, $A(i,j,2) = a(i,j)$ and $A(i,j,3) = b(i,j)$
-are the three coordinates in the CIELAB space of the pixel $(i,j)$ of
-image $A$. A two pixels wide border is excluded from the comparison
-because the function \inlinecode{demosaic_linear} does not perform the
-interpolation in this region.  The computed values of the MSE are
-shown in Tab.~\ref{tab:mse} where it can be seen that the gradient
-correction should improve a lot the quality of the interpolation,
-since it halves the MSE.
+where $A(i,j,1) = L_A(i,j)$, $A(i,j,2) = a_A(i,j)$ and $A(i,j,3) =
+b_A(i,j)$ are the three coordinates in the CIELAB space of the pixel
+$(i,j)$ of image $A$.
+%
+The computed values of the MSE are shown in Tab.~\ref{tab:mse} where
+it can be seen that the gradient-corrected linear interpolation is,
+with respect to the MSE, always the best algorithm followed by the
+pattern recognition and smooth hue transition interpolation
+algorithms, while the linear interpolation always gives the highest
+MSE.
+
+should improve a lot the
+quality of the interpolation, since it halves the MSE.
 \begin{table}[h]
   \centering
   \begin{tabular}{IRRR}
@@ -326,7 +332,8 @@ since it halves the MSE.
     kodim13.png & 6.275 & 3.707 & 4.850 \\
     kodim19.png & 3.333 & 1.974 & 2.236 \\
   \end{tabular}
-  \caption{Mean squared error of the demosaicing algorithms}
+  \caption{Mean squared error of the three tested demosaicing
+    algorithms }
   \label{tab:mse}
 \end{table}
 Unfortunately this is not the case as the gradient correction does
@@ -338,19 +345,59 @@ Fig.~\ref{fig:artifact} there are some colored vertical streaks on the
 white fence that are the result of the interpolation.
 \begin{figure}[htbp]
   \centering
-  \begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=.8\linewidth]{demosaic_kodim19_artifact}
-  \caption{\inlinecode{demosaic_linear}}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=.8\linewidth]{matlab_demosaic_kodim19_artifact}
-  \caption{\inlinecode{demosaic}}
-\end{subfigure}
-\caption{Detail of \inlinecode{kodim_19.png} after the demosaicing}
-\label{fig:artifact}
+  \begin{subfigure}{0.5\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{include_imgs/generated/kodim19_wall}
+    \caption{Original}
+  \end{subfigure}%
+  \begin{subfigure}{0.5\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{include_imgs/generated/demosaic_kodim19_wall}
+    \caption{Linear interpolation}
+  \end{subfigure}
+  \begin{subfigure}{0.5\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{include_imgs/generated/matlab_demosaic_kodim19_wall}
+    \caption{Gradient-corrected linear interpolation}
+  \end{subfigure}%
+  \begin{subfigure}{0.5\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{include_imgs/generated/prsh_demosaic_kodim19_wall}
+    \caption{PR and SHT interpolation}
+  \end{subfigure}
+  \caption{Comparison of some artifacts in \inlinecode{kodim_19.png}
+    introduced by the demosaicing}
+  \label{fig:wall}
 \end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}{0.5\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{include_imgs/generated/kodim01_door}
+    \caption{Original}
+  \end{subfigure}%
+  \begin{subfigure}{0.5\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{include_imgs/generated/demosaic_kodim01_door}
+    \caption{Linear interpolation}
+  \end{subfigure}
+  \begin{subfigure}{0.5\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{include_imgs/generated/matlab_demosaic_kodim01_door}
+    \caption{Gradient-corrected linear interpolation}
+  \end{subfigure}%
+  \begin{subfigure}{0.5\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{include_imgs/generated/prsh_demosaic_kodim01_door}
+    \caption{PR and SHT interpolation}
+  \end{subfigure}
+  \caption{Comparison of some artifacts in \inlinecode{kodim_01.png}
+    introduced by the demosaicing}
+  \label{fig:wall}
+\end{figure}
+
+
 
 \section*{Experiment 2}
 The matlab script \inlinecode{ex2.m} applies the same two demosaicing

@@ -12,3 +12,4 @@ matlab/*.png
 matlab/*.tiff
 matlab/*.asv
 images
+include_imgs/generated/
