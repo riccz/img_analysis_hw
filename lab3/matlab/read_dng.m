@@ -1,4 +1,4 @@
-function [bayer, bayer3, croparea] = read_dng(filename)
+function [bayer, bayer3, croparea, xyz2cam] = read_dng(filename)
 
 %set the bayer mask type
 bayer_type = 'rggb';
@@ -53,5 +53,5 @@ bayer3(1:2:end,2:2:end,2) = bayer(1:2:end,2:2:end);
 bayer3(2:2:end,1:2:end,2) = bayer(2:2:end,1:2:end);
 
 % - - - Color Correction Matrix from DNG Info - - -
-%temp = meta_info.ColorMatrix2;
-% xyz2cam = reshape(temp,3,3)';
+xyz2cam_ = meta_info.ColorMatrix2;
+xyz2cam = reshape(xyz2cam_,3,3)';
