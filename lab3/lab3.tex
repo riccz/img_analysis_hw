@@ -296,7 +296,7 @@ perform the demosaicing. The output images are saved as
 \inlinecode{prsh_demosaic_kodimXX.png}.
 
 \subsection{Comparison}
-After the imgaes have been demosaiced by each one of the three
+After the images have been demosaiced by each one of the three
 algorithms, they are converted from the sRGB to the CIELAB color space
 and the MSE between the output and the original images is
 computed. The MSE between $A$ and $B$ is computed by taking the
@@ -316,9 +316,6 @@ with respect to the MSE, always the best algorithm followed by the
 pattern recognition and smooth hue transition interpolation
 algorithms, while the linear interpolation always gives the highest
 MSE.
-
-should improve a lot the
-quality of the interpolation, since it halves the MSE.
 \begin{table}[h]
   \centering
   \begin{tabular}{IRRR}
@@ -336,31 +333,53 @@ quality of the interpolation, since it halves the MSE.
     algorithms }
   \label{tab:mse}
 \end{table}
-Unfortunately this is not the case as the gradient correction does
-improve a little bit the quality of the reconstructed images, but it
-still leaves a lot of noticeable artifacts close to edges and small
-details. For example in the detail of image \inlinecode{kodim_19.png},
-where both algorithms obtain the smallest value of the MSE, shown in
-Fig.~\ref{fig:artifact} there are some colored vertical streaks on the
-white fence that are the result of the interpolation.
+
+A visual comparison of the demosaiced images with the original,
+however, shows that the MSE is not always a good indicator of the
+performances of the algorithms (see Fig.s \ref{fig:wall} and
+\ref{fig:door}).
+%
+The linear interpolation algorithm is the worst performing one, since
+it creates a lot of artifacts in the output images, especially along
+the edges. It also slightly blurs the image because it interpolates
+the pixels on the edges using samples from both sides.
+%
+The gradient-corrected interpolation works better and the resulting
+image is less blurred, but it still leaves very noticeable zippering
+and false color artifacts.
+%
+The pattern recognition algorithm is designed specifically to avoid
+interpolating across an edge so, as expected, it reduces a lot these
+two kind of artifacts, even if it not able to completely eliminate
+them.
+%
+It also alters some small details, like the door knob in
+Fig. \ref{fig:door} that becomes a square, and this may be the cause
+for its higher MSE value than the gradient-corrected algorithm, even
+if the resulting images look closer to the original ones.
+%
+Another reason for the mismatch between the MSE comparison and the
+visual comparison may be that these particular images were part of the
+set used to optimize the gradient-correction gain for the minimum MSE,
+so if new images were used they would maybe yield worse MSE values.
 \begin{figure}[htbp]
   \centering
-  \begin{subfigure}{0.5\textwidth}
+  \begin{subfigure}{0.4\textwidth}
     \centering
     \includegraphics[width=0.95\textwidth]{include_imgs/generated/kodim19_wall}
     \caption{Original}
   \end{subfigure}%
-  \begin{subfigure}{0.5\textwidth}
+  \begin{subfigure}{0.4\textwidth}
     \centering
     \includegraphics[width=0.95\textwidth]{include_imgs/generated/demosaic_kodim19_wall}
     \caption{Linear interpolation}
   \end{subfigure}
-  \begin{subfigure}{0.5\textwidth}
+  \begin{subfigure}{0.4\textwidth}
     \centering
     \includegraphics[width=0.95\textwidth]{include_imgs/generated/matlab_demosaic_kodim19_wall}
     \caption{Gradient-corrected linear interpolation}
   \end{subfigure}%
-  \begin{subfigure}{0.5\textwidth}
+  \begin{subfigure}{0.4\textwidth}
     \centering
     \includegraphics[width=0.95\textwidth]{include_imgs/generated/prsh_demosaic_kodim19_wall}
     \caption{PR and SHT interpolation}
@@ -369,35 +388,36 @@ white fence that are the result of the interpolation.
     introduced by the demosaicing}
   \label{fig:wall}
 \end{figure}
-
+Another disadvantage of the demosaicing performed with the pattern
+recognition and the smooth hue transition interpolation is that they
+are non-linear (unlike the other two approaches) and require more
+computational resources.
 \begin{figure}[htbp]
   \centering
-  \begin{subfigure}{0.5\textwidth}
+  \begin{subfigure}{0.4\textwidth}
     \centering
     \includegraphics[width=0.95\textwidth]{include_imgs/generated/kodim01_door}
     \caption{Original}
   \end{subfigure}%
-  \begin{subfigure}{0.5\textwidth}
+  \begin{subfigure}{0.4\textwidth}
     \centering
     \includegraphics[width=0.95\textwidth]{include_imgs/generated/demosaic_kodim01_door}
     \caption{Linear interpolation}
   \end{subfigure}
-  \begin{subfigure}{0.5\textwidth}
+  \begin{subfigure}{0.4\textwidth}
     \centering
     \includegraphics[width=0.95\textwidth]{include_imgs/generated/matlab_demosaic_kodim01_door}
     \caption{Gradient-corrected linear interpolation}
   \end{subfigure}%
-  \begin{subfigure}{0.5\textwidth}
+  \begin{subfigure}{0.4\textwidth}
     \centering
     \includegraphics[width=0.95\textwidth]{include_imgs/generated/prsh_demosaic_kodim01_door}
     \caption{PR and SHT interpolation}
   \end{subfigure}
   \caption{Comparison of some artifacts in \inlinecode{kodim_01.png}
     introduced by the demosaicing}
-  \label{fig:wall}
+  \label{fig:door}
 \end{figure}
-
-
 
 \section*{Experiment 2}
 The matlab script \inlinecode{ex2.m} applies the same two demosaicing
