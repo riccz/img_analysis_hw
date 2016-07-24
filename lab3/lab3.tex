@@ -29,13 +29,12 @@
 \begin{document}
 \matlabcodeconfig
 \maketitle
-\section*{Experiment 1}
-\stepcounter{section}
-The purpose of first part of this homework is to implement two
+\section*{Experiment 1} \stepcounter{section}
+The purpose of the first part of this homework is to implement two
 demosaicing algorithms and test them, together with the one
-implemented in Matlab, on the eight images \inlinecode{kodimXX.png}
-to compare their performances, visually and using the mean squared
-error in the CIELAB color space.
+implemented in Matlab, on the eight images \inlinecode{kodimXX.png} to
+compare their performances, visually and using the mean squared error
+in the CIELAB color space.
 
 Each one of the test images is downsampled by the provided function
 \inlinecode{create_bayer} according to the GRBG Bayer mask (see
@@ -57,10 +56,11 @@ would be acquired by a single-sensor imaging system,
   \end{subfigure}
   \caption{The two Bayer CFA patterns used in this homework}
 \end{figure}
-and is then demosaiced using three of the algorithms described in
-\cite{demosaic_alg}: the linear interpolation, the gradient-corrected
-linear interpolation and a combination of the pattern recognition
-interpolation and the smooth hue transition interpolation.
+and is then demosaiced using three of the algorithms described
+in~\cite{demosaic_alg}:~the linear interpolation, the
+gradient-corrected linear interpolation and a combination of the
+pattern recognition interpolation and the smooth hue transition
+interpolation.
 
 \subsection{Linear interpolation}
 \label{sec:linear}
@@ -350,7 +350,7 @@ and false color artifacts.
 %
 The pattern recognition algorithm is designed specifically to avoid
 interpolating across an edge so, as expected, it reduces a lot these
-two kind of artifacts, even if it not able to completely eliminate
+two kind of artifacts, even if it is not able to completely eliminate
 them.
 %
 It also alters some small details, like the door knob in
@@ -360,8 +360,8 @@ if the resulting images look closer to the original ones.
 %
 Another reason for the mismatch between the MSE comparison and the
 visual comparison may be that these particular images were part of the
-set used to optimize the gradient-correction gain for the minimum MSE,
-so if new images were used they would maybe yield worse MSE values.
+set used to optimize the gradient-correction gain, so if new images
+were used they would maybe yield worse MSE values.
 \begin{figure}[htbp]
   \centering
   \begin{subfigure}{0.4\textwidth}
@@ -419,7 +419,7 @@ computational resources.
   \label{fig:door}
 \end{figure}
 
-\section*{Experiment 2}
+\section*{Experiment 2} \stepcounter{section}
 The matlab script \inlinecode{ex2.m} applies the same two demosaicing
 algorithms to some images acquired from a reflex camera. This time,
 since it starts from the raw sensor data, it has to perform some
