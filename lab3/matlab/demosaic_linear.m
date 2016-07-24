@@ -1,6 +1,7 @@
 function img = demosaic_linear(bayer)
 assert(ismatrix(bayer));
-assert(isa(bayer, 'uint8'));
+isuint8 = isa(bayer, 'uint8');
+isuint16 = isa(bayer, 'uint16');
 bayer = double(bayer);
 [H,W] = size(bayer);
 img = zeros(H,W,3);
@@ -23,7 +24,7 @@ for i=1:H
         elseif i == 1 && j == 1 % Top-left corner
             error('Should always be green');
         elseif i == 1 && j == W % Top-right corner
-            img(i,j,2) = mean([bayer(i+1,j), bayer(i,j-1)]);    
+            img(i,j,2) = mean([bayer(i+1,j), bayer(i,j-1)]);
         elseif j == 1 && i == H % Bottom-left corner
             img(i,j,2) = mean([bayer(i-1,j), bayer(i,j+1)]);
         elseif j == W && i == H % Bottom-right corner
@@ -31,7 +32,7 @@ for i=1:H
         else
             error('Missing case');
         end
-       
+        
         i_even = mod(i, 2) == 0;
         i_odd = ~i_even;
         j_even = mod(j, 2) == 0;
@@ -71,7 +72,7 @@ for i=1:H
                 error('Missing case');
             end
         end
-              
+        
         % Blue
         if i_even && j_odd % Copy the blue pixels
             img(i,j,3) = bayer(i,j);
@@ -101,7 +102,7 @@ for i=1:H
             elseif i > 1 && i < H && j == W % Right border
                 img(i,j,3) = mean([bayer(i-1,j-1) bayer(i+1,j-1)]);
             elseif j == W && i == 1 % Top-right corner
-               img(i,j,3) = bayer(i+1,j-1);
+                img(i,j,3) = bayer(i+1,j-1);
             elseif j == W && i == H % Bottom-right corner
                 img(i,j,3) = bayer(i-1,j-1);
             else
@@ -111,5 +112,9 @@ for i=1:H
     end
 end
 
-img = uint8(img);
+if isuint8
+    img = uint8(img);
+elseif isuint16
+    img = uint16(img);
+end
 end

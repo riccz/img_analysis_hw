@@ -1,6 +1,7 @@
 function img_green = pattern_interp(bayer_green)
 assert(ismatrix(bayer_green));
-assert(isa(bayer_green, 'uint8'));
+isuint8 = isa(bayer_green, 'uint8');
+isuint16 = isa(bayer_green, 'uint16');
 bayer_green = double(bayer_green);
 [H,W] = size(bayer_green);
 img_green = zeros(H,W);
@@ -104,7 +105,12 @@ for x=0:W-1
         img_green(y+1,x+1) = clip(neighs, 2*median_g - mean(X));
     end
 end
-img_green = uint8(img_green);
+
+if isuint8
+    img_green = uint8(img_green);
+elseif isuint16
+    img_green = uint16(img_green);
+end
 end
 
 function G = clip(neighs, x)

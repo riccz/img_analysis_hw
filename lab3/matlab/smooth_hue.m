@@ -1,7 +1,8 @@
 function img = smooth_hue(bayer3, beta)
 assert(isscalar(beta));
 assert(ndims(bayer3) == 3);
-assert(isa(bayer3, 'uint8'));
+isuint8 = isa(bayer3, 'uint8');
+isuint16 = isa(bayer3, 'uint16');
 bayer3 = double(bayer3);
 [H,W,C] = size(bayer3);
 assert(C == 3);
@@ -121,5 +122,10 @@ for x=0:W-1
         end
     end
 end
-img = uint8(img);
+
+if isuint8
+    img = uint8(img);
+elseif isuint16
+    img = uint16(img);
+end
 end
