@@ -9,6 +9,7 @@
 /lab*.zip
 matlab/*.eps
 matlab/*.png
+matlab/*.jpg
 matlab/*.tiff
 matlab/*.asv
 images
