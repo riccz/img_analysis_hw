@@ -427,7 +427,7 @@ camera saves as JPEG file.
 
 \subsection{Linearization}
 First the pixel intensities must be linearized, because the camera may
-perform a non-linear transformtion for storage reasons, and rescaled
+perform a non-linear transformation for storage reasons, and rescaled
 to fit the range of the pixel values. The linearization table is
 provided by the camera in the image metadata and the
 \inlinecode{read_dng} function just has to map the values using
@@ -437,7 +437,7 @@ interval.
 
 \subsection{White Balancing}
 Since the color sensed by the camera depends on the illuminant, and
-also because the color filter array atteenuates differently each of
+also because the color filter array attenuates differently each of
 the three color components, each channel must be scaled to balance the
 white in the image.
 %
@@ -461,14 +461,14 @@ pixels wider and higher than the size the output is cropped to.
 
 After having been demosaiced using each one of the three algorithms
 described in the previous experiment: linear interpolation,
-grandient-correcred interpolation and pattern recognition with smooth
+gradient-corrected interpolation and pattern recognition with smooth
 hue transition interpolation, the images are cropped to their default
 size, specified in the RAW metadata (6000 by 4000 pixels, starting
 from $(7,8)$).
 
 \subsection{Color space conversion}
 The color of the image is, at this point, still expressed in terms of
-the color space of the camera's sensor. So, to be visualized correclty
+the color space of the camera's sensor. So, to be visualized correctly
 on a screen, the image must be converted into the sRGB color space.
 %
 In the RAW metadata there is the matrix to convert from the XYZ color
@@ -487,7 +487,7 @@ space.
 %
 Since the white pixels must remain white after the transformation
 (because the white balance was already performed) the transformation
-matrix' rows must be normalized tso that they sum to 1. With this
+matrix' rows must be normalized so that they sum to 1. With this
 normalization
 \begin{equation*}
   \left[ \begin{array}{c} 1 \\ 1 \\ 1 \end{array} \right]_{cam} =
@@ -507,7 +507,7 @@ was added to the provided function \inlinecode{post_process}.
 
 \subsection{Brightness and gamma correction}
 After the color correction \inlinecode{post_process} applies a simple
-brighteningh measure: it finds the mean luminance of the image and
+brightening measure: it finds the mean luminance of the image and
 scales the image intensities so that the mean luminance is $1/4$ of
 the maximum.
 
@@ -515,12 +515,16 @@ Finally, a gamma correction with $\gamma = \frac{1}{2.2}$ is applied
 to the image, to brighten the dark areas.
 
 \subsection{Comparison}
+In Fig. \ref{fig:chart} it can be seen that the output of the pipeline
+looks correct enough, however the camera is likely using different
+parameters and algorithms to process the RAW files, especially for the
+last two steps: the brightening and the gamma correction.
 \begin{figure}[htbp]
   \centering
   \begin{subfigure}{.4\textwidth}
     \centering
     \includegraphics[width=.95\linewidth]{include_imgs/generated/macbeth_color_small}
-    \caption{JPEG prodced by the camera}
+    \caption{JPEG produced by the camera}
   \end{subfigure}%
   \begin{subfigure}{.4\textwidth}
     \centering
@@ -540,13 +544,17 @@ to the image, to brighten the dark areas.
   \caption{Comparison of the color chart}
   \label{fig:chart}
 \end{figure}
-
+The choice of demosaicing algorithm does not appear to have any effect
+of the final result and there are not many noticeable artifacts in the
+images. Some of them, like those on the edges of the white car in
+Fig. \ref{fig:park}, may also be caused by the lenses since they are
+very close to the border of the picture.
 \begin{figure}[htbp]
   \centering
   \begin{subfigure}{.4\textwidth}
     \centering
     \includegraphics[width=.95\linewidth]{include_imgs/generated/DEI_park_small}
-    \caption{JPEG prodced by the camera}
+    \caption{JPEG produced by the camera}
   \end{subfigure}%
   \begin{subfigure}{.4\textwidth}
     \centering
@@ -564,16 +572,20 @@ to the image, to brighten the dark areas.
     \caption{PRI and SHTI demosaicing}
   \end{subfigure}
   \caption{Comparison of a detail from \inlinecode{DEI_park.dng}, near
-    the pucture border}
+    the picture border}
   \label{fig:park}
 \end{figure}
-
+Something that is very noticeable is the noisiness of the resulting
+images, compared to the ones processed by the camera (see
+Fig. \ref{fig:students}): the camera is likely applying some kind of
+low-pass filter somewhere in the pipeline to smooth out the noise,
+while the code implemented for this homework does not do so.
 \begin{figure}[htbp]
   \centering
   \begin{subfigure}{.4\textwidth}
     \centering
     \includegraphics[width=.95\linewidth]{include_imgs/generated/students2_small}
-    \caption{JPEG prodced by the camera}
+    \caption{JPEG produced by the camera}
   \end{subfigure}%
   \begin{subfigure}{.4\textwidth}
     \centering
@@ -593,21 +605,10 @@ to the image, to brighten the dark areas.
   \caption{Comparison of a dark area from \inlinecode{students2.dng}}
   \label{fig:students}
 \end{figure}
-
-
-Comparing the results with the JPEG files produced by the camera it
-can be seen that the steps that are skipped in the raw image processing
-affect the color, in particular the \inlinecode{post_process} function
-does not convert the image from the color space of the camera to
-sRGB. As can be seen in Fig.~\ref{fig:chart} the result images appear
-to have a much lower contrast than the camera JPEG file.
-
-The demosaicing performed by the matlab script also leaves a lot of
-artifacts, especially in the dark areas as can be seen from
-Fig.~\ref{fig:dark_artifacts}. In this case the linear interpolation
-algorithm appears to produce slightly better images than the gradient
-corrected one, but they are both very noisy compared to the camera's
-processed images.
+The high noise level may be the reason that makes the choice of
+demosaicing algorithm irrelevant, since the artifacts that are
+introduced by the three tested algorithms are not distinguishable
+from it.
 
 \printbibliography
 \end{document}
