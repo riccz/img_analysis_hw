@@ -32,7 +32,7 @@
 \section*{Experiment 1} \stepcounter{section}
 The purpose of the first part of this homework is to implement two
 demosaicing algorithms and test them, together with the one
-implemented in Matlab, on the eight images \inlinecode{kodimXX.png} to
+implemented in Matlab, on the four images \inlinecode{kodimXX.png} to
 compare their performances, visually and using the mean squared error
 in the CIELAB color space.
 
@@ -420,31 +420,180 @@ computational resources.
 \end{figure}
 
 \section*{Experiment 2} \stepcounter{section}
-The matlab script \inlinecode{ex2.m} applies the same two demosaicing
-algorithms to some images acquired from a reflex camera. This time,
-since it starts from the raw sensor data, it has to perform some
-additional steps to get an output that can be compared to the JPEG
-files produced by the camera. The script reads the DNG files using the
-provided function \inlinecode{read_dng}, which also performs the
-linearization and white balancing of the image using the meta-data
-stored with it, then it applies the same two demosaicing algorithms
-of experiment 1.
+The second part of this homework will implement a simple pipeline,
+described in \cite{rawguide}, to process the RAW images captured by a
+digital reflex camera and obtain a final image similar to what the
+camera saves as JPEG file.
 
-The raw data of the image is stored according to a ``RGGB'' Bayer
-pattern so the script adds one column of zeros at the beginning and at
-the end of the image, in this way it shifts the pattern horizontally
-by one pixel and it becomes the ``GRBG'' pattern that the function
-\inlinecode{demosaic_linear} expects. The extra columns do not affect
-the demosaicing results because this function skips a two pixel wide
-border around the image.  The built-in \inlinecode{demosaic} function
-could work directly on the ``RGGB'' pattern, but since the two columns
-must be added anyway the script uses it in the same way of experiment
-1. This function also requires the input pixels to be of type
-\inlinecode{uint8} so the image is converted before the demosaicing.
+\subsection{Linearization}
+First the pixel intensities must be linearized, because the camera may
+perform a non-linear transformtion for storage reasons, and rescaled
+to fit the range of the pixel values. The linearization table is
+provided by the camera in the image metadata and the
+\inlinecode{read_dng} function just has to map the values using
+it. The metadata also contains the black and the saturation value for
+the sensor, which are used to map the pixel intensities in the $[0,1]$
+interval.
 
-After the demosaicing step, the image is post-processed with the
-provided \inlinecode{post_process} function that normalizes the image
-intensity and applies a gamma correction.
+\subsection{White Balancing}
+Since the color sensed by the camera depends on the illuminant, and
+also because the color filter array atteenuates differently each of
+the three color components, each channel must be scaled to balance the
+white in the image.
+%
+This is done by arbitrarily setting one of the scale factors to 1
+(usually the green one) and choosing the other two in order to make
+certain known points of the image white (or gray). The camera stores
+in the RAW metadata its best guess for the multipliers so the
+\inlinecode{read_dng} function just applies them.
+
+\subsection{Demosaicing}
+Since the raw data of the image is stored according to the RGGB Bayer
+pattern (see Fig.~\ref{fig:bayer_rggb}), instead of the GRBG used in
+the previous experiment, the provided \inlinecode{read_dng} function
+is modified to return the pixels from the whole active area and the
+coordinates to crop the image separately. In this way the demosaicing
+functions do not need to be modified: it is sufficient to drop the
+first column from the image (and adjust the cropping coordinates
+accordingly) to fall back to the GRBG case. The lost pixels do not
+affect the final image because the active area is, in this case, 16
+pixels wider and higher than the size the output is cropped to.
+
+After having been demosaiced using each one of the three algorithms
+described in the previous experiment: linear interpolation,
+grandient-correcred interpolation and pattern recognition with smooth
+hue transition interpolation, the images are cropped to their default
+size, specified in the RAW metadata (6000 by 4000 pixels, starting
+from $(7,8)$).
+
+\subsection{Color space conversion}
+The color of the image is, at this point, still expressed in terms of
+the color space of the camera's sensor. So, to be visualized correclty
+on a screen, the image must be converted into the sRGB color space.
+%
+In the RAW metadata there is the matrix to convert from the XYZ color
+space to the camera's color space $A_{cam \leftarrow XYZ}$, that
+combined with the sRGB to XYZ transformation matrix
+\begin{equation*}
+  A_{XYZ \leftarrow sRGB} = \left[ \begin{array}{ccc}
+      0.4124564 & 0.3575761 & 0.1804375 \\
+      0.2126729 & 0.7151522 & 0.0721750 \\
+      0.0193339 & 0.1191920 & 0.9503041
+    \end{array} \right]
+\end{equation*}
+gives the matrix $A_{cam \leftarrow sRGB} = A_{cam \leftarrow XYZ}
+A_{XYZ \leftarrow sRGB}$ that converts from sRGB to the camera's color
+space.
+%
+Since the white pixels must remain white after the transformation
+(because the white balance was already performed) the transformation
+matrix' rows must be normalized tso that they sum to 1. With this
+normalization
+\begin{equation*}
+  \left[ \begin{array}{c} 1 \\ 1 \\ 1 \end{array} \right]_{cam} =
+  A'_{cam \leftarrow sRGB}
+  \left[ \begin{array}{c} 1 \\ 1 \\ 1 \end{array} \right]_{sRGB}
+\end{equation*}
+and the inverse of the normalized matrix
+\begin{equation*}
+  A'_{sRGB \leftarrow cam}  = \left( A'_{cam \leftarrow sRGB} \right)^{-1}
+\end{equation*}
+can be applied to the demosaiced images to perform the color
+correction.
+
+The provided function \inlinecode{read_dng} was modified to read and
+return the $A_{cam \leftarrow XYZ}$ matrix, while the color correction
+was added to the provided function \inlinecode{post_process}.
+
+\subsection{Brightness and gamma correction}
+After the color correction \inlinecode{post_process} applies a simple
+brighteningh measure: it finds the mean luminance of the image and
+scales the image intensities so that the mean luminance is $1/4$ of
+the maximum.
+
+Finally, a gamma correction with $\gamma = \frac{1}{2.2}$ is applied
+to the image, to brighten the dark areas.
+
+\subsection{Comparison}
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}{.4\textwidth}
+    \centering
+    \includegraphics[width=.95\linewidth]{include_imgs/generated/macbeth_color_small}
+    \caption{JPEG prodced by the camera}
+  \end{subfigure}%
+  \begin{subfigure}{.4\textwidth}
+    \centering
+    \includegraphics[width=.95\linewidth]{include_imgs/generated/demosaic_macbeth_color_small}
+    \caption{Linear demosaicing}
+  \end{subfigure}
+  \begin{subfigure}{.4\textwidth}
+    \centering
+    \includegraphics[width=.95\linewidth]{include_imgs/generated/matlab_demosaic_macbeth_color_small}
+    \caption{Gradient-corrected demosaicing}
+  \end{subfigure}%
+  \begin{subfigure}{.4\textwidth}
+    \centering
+    \includegraphics[width=.95\linewidth]{include_imgs/generated/prsh_demosaic_macbeth_color_small}
+    \caption{PRI and SHTI demosaicing}
+  \end{subfigure}
+  \caption{Comparison of the color chart}
+  \label{fig:chart}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}{.4\textwidth}
+    \centering
+    \includegraphics[width=.95\linewidth]{include_imgs/generated/DEI_park_small}
+    \caption{JPEG prodced by the camera}
+  \end{subfigure}%
+  \begin{subfigure}{.4\textwidth}
+    \centering
+    \includegraphics[width=.95\linewidth]{include_imgs/generated/demosaic_DEI_park_small}
+    \caption{Linear demosaicing}
+  \end{subfigure}
+  \begin{subfigure}{.4\textwidth}
+    \centering
+    \includegraphics[width=.95\linewidth]{include_imgs/generated/matlab_demosaic_DEI_park_small}
+    \caption{Gradient-corrected demosaicing}
+  \end{subfigure}%
+  \begin{subfigure}{.4\textwidth}
+    \centering
+    \includegraphics[width=.95\linewidth]{include_imgs/generated/prsh_demosaic_DEI_park_small}
+    \caption{PRI and SHTI demosaicing}
+  \end{subfigure}
+  \caption{Comparison of a detail from \inlinecode{DEI_park.dng}, near
+    the pucture border}
+  \label{fig:park}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}{.4\textwidth}
+    \centering
+    \includegraphics[width=.95\linewidth]{include_imgs/generated/students2_small}
+    \caption{JPEG prodced by the camera}
+  \end{subfigure}%
+  \begin{subfigure}{.4\textwidth}
+    \centering
+    \includegraphics[width=.95\linewidth]{include_imgs/generated/demosaic_students2_small}
+    \caption{Linear demosaicing}
+  \end{subfigure}
+  \begin{subfigure}{.4\textwidth}
+    \centering
+    \includegraphics[width=.95\linewidth]{include_imgs/generated/matlab_demosaic_students2_small}
+    \caption{Gradient-corrected demosaicing}
+  \end{subfigure}%
+  \begin{subfigure}{.4\textwidth}
+    \centering
+    \includegraphics[width=.95\linewidth]{include_imgs/generated/prsh_demosaic_students2_small}
+    \caption{PRI and SHTI demosaicing}
+  \end{subfigure}
+  \caption{Comparison of a dark area from \inlinecode{students2.dng}}
+  \label{fig:students}
+\end{figure}
+
 
 Comparing the results with the JPEG files produced by the camera it
 can be seen that the steps that are skipped in the raw image processing
@@ -452,52 +601,13 @@ affect the color, in particular the \inlinecode{post_process} function
 does not convert the image from the color space of the camera to
 sRGB. As can be seen in Fig.~\ref{fig:chart} the result images appear
 to have a much lower contrast than the camera JPEG file.
-\begin{figure}[htbp]
-  \centering
-  \begin{subfigure}{.33\textwidth}
-  \centering
-  \includegraphics[width=.95\linewidth]{demosaic_macbeth_color_small}
-  \caption{\inlinecode{demosaic_linear}}
-\end{subfigure}%
-\begin{subfigure}{.33\textwidth}
-  \centering
-  \includegraphics[width=.95\linewidth]{matlab_demosaic_macbeth_color_small}
-  \caption{\inlinecode{demosaic}}
-\end{subfigure}%
-  \begin{subfigure}{.33\textwidth}
-  \centering
-  \includegraphics[width=.95\linewidth]{camera_macbeth_color_small}
-  \caption{JPEG from the camera}
-\end{subfigure}
-\caption{Comparison of the color chart}
-\label{fig:chart}
-\end{figure}
+
 The demosaicing performed by the matlab script also leaves a lot of
 artifacts, especially in the dark areas as can be seen from
 Fig.~\ref{fig:dark_artifacts}. In this case the linear interpolation
 algorithm appears to produce slightly better images than the gradient
 corrected one, but they are both very noisy compared to the camera's
 processed images.
-\begin{figure}[htbp]
-  \centering
-  \begin{subfigure}{.33\textwidth}
-  \centering
-  \includegraphics[width=.95\linewidth]{demosaic_students2_detail}
-  \caption{\inlinecode{demosaic_linear}}
-\end{subfigure}%
-\begin{subfigure}{.33\textwidth}
-  \centering
-  \includegraphics[width=.95\linewidth]{matlab_demosaic_students2_detail}
-  \caption{\inlinecode{demosaic}}
-\end{subfigure}%
-  \begin{subfigure}{.33\textwidth}
-  \centering
-  \includegraphics[width=.95\linewidth]{camera_students2_detail}
-  \caption{JPEG from the camera}
-\end{subfigure}
-\caption{Comparison of a detail from \inlinecode{students2.dng}}
-\label{fig:dark_artifacts}
-\end{figure}
 
 \printbibliography
 \end{document}

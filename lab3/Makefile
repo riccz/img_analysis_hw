@@ -40,4 +40,19 @@ img_details:
 	convert matlab/matlab_demosaic_kodim01.png -crop 350x262+210+250 include_imgs/generated/matlab_demosaic_kodim01_door.png
 	convert matlab/prsh_demosaic_kodim01.png -crop 350x262+210+250 include_imgs/generated/prsh_demosaic_kodim01_door.png
 
+	convert images/macbeth_color.JPG -resize 400x400 include_imgs/generated/macbeth_color_small.png
+	convert matlab/demosaic_macbeth_color.jpg -resize 400x400 include_imgs/generated/demosaic_macbeth_color_small.png
+	convert matlab/matlab_demosaic_macbeth_color.jpg -resize 400x400 include_imgs/generated/matlab_demosaic_macbeth_color_small.png
+	convert matlab/prsh_demosaic_macbeth_color.jpg -resize 400x400 include_imgs/generated/prsh_demosaic_macbeth_color_small.png
+
+	convert images/DEI_park.JPG -crop 1333x1000+0+3000 -resize 400x400 include_imgs/generated/DEI_park_small.png
+	convert matlab/demosaic_DEI_park.jpg -crop 1333x1000+0+3000 -resize 400x400 include_imgs/generated/demosaic_DEI_park_small.png
+	convert matlab/matlab_demosaic_DEI_park.jpg -crop 1333x1000+0+3000 -resize 400x400 include_imgs/generated/matlab_demosaic_DEI_park_small.png
+	convert matlab/prsh_demosaic_DEI_park.jpg -crop 1333x1000+0+3000 -resize 400x400 include_imgs/generated/prsh_demosaic_DEI_park_small.png
+
+	convert images/students2.JPG -crop 1333x1000+0+2600 -resize 400x400 include_imgs/generated/students2_small.png
+	convert matlab/demosaic_students2.jpg -crop 1333x1000+0+2600 -resize 400x400 include_imgs/generated/demosaic_students2_small.png
+	convert matlab/matlab_demosaic_students2.jpg -crop 1333x1000+0+2600 -resize 400x400 include_imgs/generated/matlab_demosaic_students2_small.png
+	convert matlab/prsh_demosaic_students2.jpg -crop 1333x1000+0+2600 -resize 400x400 include_imgs/generated/prsh_demosaic_students2_small.png
+
 .PHONY: clean all img_details
