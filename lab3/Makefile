@@ -1,6 +1,6 @@
 ZIPFILE = lab3.zip
 CODE_FILES = matlab/*.m images/kodim*.png
-EXTRA_IMGS = matlab/*demosaic_kodim*.png
+EXTRA_IMGS = matlab/*demosaic_kodim*.png matlab/*demosaic*.jpg
 
 all: clean $(ZIPFILE)
 
